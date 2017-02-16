@@ -10,7 +10,7 @@ export default {
   },
 
   validateConfig: (opts, argvMock = null, envMock = null) => {
-    let config = _.assign({}, settings.config);
+    // let config = _.assign({}, settings.config);
     let runArgv = argv;
     let env = process.env;
 
@@ -23,23 +23,23 @@ export default {
     }
 
     // required:
-    config.username = env.SAUCE_USERNAME;
-    config.accessKey = env.SAUCE_ACCESS_KEY;
-    config.sauceConnectVersion = env.SAUCE_CONNECT_VERSION;
+    settings.config.username = env.SAUCE_USERNAME;
+    settings.config.accessKey = env.SAUCE_ACCESS_KEY;
+    settings.config.sauceConnectVersion = env.SAUCE_CONNECT_VERSION;
     // optional:
-    config.sauceTunnelId = runArgv.sauce_tunnel_id;
-    config.sharedSauceParentAccount = runArgv.shared_sauce_parent_account;
-    config.useTunnels = !!runArgv.sauce_create_tunnels;
-    config.tunnelTimeout = env.SAUCE_TUNNEL_CLOSE_TIMEOUT;
-    config.fastFailRegexps = env.SAUCE_TUNNEL_FAST_FAIL_REGEXPS;
+    settings.config.sauceTunnelId = runArgv.sauce_tunnel_id;
+    settings.config.sharedSauceParentAccount = runArgv.shared_sauce_parent_account;
+    settings.config.useTunnels = !!runArgv.sauce_create_tunnels;
+    settings.config.tunnelTimeout = env.SAUCE_TUNNEL_CLOSE_TIMEOUT;
+    settings.config.fastFailRegexps = env.SAUCE_TUNNEL_FAST_FAIL_REGEXPS;
 
-    config.locksServerLocation = env.LOCKS_SERVER;
+    settings.config.locksServerLocation = env.LOCKS_SERVER;
 
     // Remove trailing / in locks server location if it's present.
-    if (typeof config.locksServerLocation === "string" && config.locksServerLocation.length > 0) {
-      if (config.locksServerLocation.charAt(config.locksServerLocation.length - 1) === "/") {
-        config.locksServerLocation = config.locksServerLocation.substr(0,
-          config.locksServerLocation.length - 1);
+    if (typeof settings.config.locksServerLocation === "string" && settings.config.locksServerLocation.length > 0) {
+      if (settings.config.locksServerLocation.charAt(settings.config.locksServerLocation.length - 1) === "/") {
+        settings.config.locksServerLocation = settings.config.locksServerLocation.substr(0,
+          settings.config.locksServerLocation.length - 1);
       }
     }
 
@@ -64,7 +64,7 @@ export default {
       let valid = true;
 
       _.forEach(parameterWarnings, (v, k) => {
-        if (!config[k]) {
+        if (!settings.config[k]) {
           if (v.required) {
             logger.err("Error! Sauce requires " + k + " to be set. Check if the"
               + " environment variable $" + v.envKey + " is defined.");
@@ -93,20 +93,18 @@ export default {
       }
 
       // after verification we want to add sauce_tunnel_id if it's null till now
-      if (!config.sauceTunnelId && config.useTunnels) {
+      if (!settings.config.sauceTunnelId && settings.config.useTunnels) {
         // auto generate tunnel id
-        config.sauceTunnelId = guid();
+        settings.config.sauceTunnelId = guid();
       }
 
       logger.debug("Sauce configuration: ");
-      logger.debug(JSON.stringify(config));
-
-      settings.config = config;
+      logger.debug(JSON.stringify(settings.config));
 
       logger.log("Sauce configuration OK");
 
     }
 
-    return config;
+    return settings.config;
   }
 };
