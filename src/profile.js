@@ -1,8 +1,8 @@
 import _ from "lodash";
 import SauceBrowsers from "guacamole";
 import listSauceCliBrowsers from "guacamole/src/cli_list";
-
 import { argv } from "yargs";
+import logger from "./logger";
 
 export default {
   getProfiles: (opts, argvMock = null) => {
@@ -26,6 +26,8 @@ export default {
               id: runArgv.sauce_browser
             };
 
+            logger.debug("detected profile: " + JSON.stringify(p));
+
             resolve(p);
           } else if (runArgv.sauce_browsers) {
             const tempBrowsers = runArgv.sauce_browsers.split(",");
@@ -45,6 +47,8 @@ export default {
 
               returnBrowsers.push(p);
             });
+
+            logger.debug("detected profiles: " + JSON.stringify(returnBrowsers));
 
             resolve(returnBrowsers);
           } else {
@@ -107,6 +111,7 @@ export default {
       .then(() => {
         return new Promise((resolve) => {
           if (runArgv.device_additions) {
+            logger.log("Loading customized profiles");
             SauceBrowsers.addNormalizedBrowsersFromFile(runArgv.device_additions);
           }
           resolve();
@@ -117,20 +122,19 @@ export default {
           listSauceCliBrowsers((browserTable) => {
             // convert table heading
             browserTable.options.head[1] = "Copy-Paste Command-Line Option";
-            console.log(browserTable)
             logger.loghelp(browserTable.toString());
             logger.loghelp("");
-            resolve();
+            resolve(browserTable);
           });
         });
       })
-      .then(() => {
-        callback();
+      .then((browserTable) => {
+        callback(null, browserTable);
       })
       .catch((err) => {
         logger.err("Couldn't fetch sauce browsers. Error: " + err);
         logger.err(err.stack);
-        callback();
+        callback(err);
       });
   }
 };

@@ -7,18 +7,34 @@ import logger from "./logger";
 import settings from "./settings";
 import analytics from "./global_analytics";
 
-const config = settings.config;
+let config = settings.config;
 
 let tunnel = null;
 let locks = null;
 
 export default {
-  setup: () => {
-    locks = new Locks(config);
+  setup: (mocks = null) => {
+    let iLocks = Locks;
+    let iTunnel = Tunnel;
+
+    if (mocks) {
+      if (mocks.Locks) {
+        iLocks = mocks.Locks;
+      }
+      if (mocks.Tunnel) {
+        iTunnel = mocks.Tunnel;
+      }
+      if (mocks.config) {
+        config = mocks.config;
+      }
+    }
+
+    locks = new iLocks(config);
+    logger.log("Setting pre-requisites up");
 
     if (config.useTunnels) {
       // create new tunnel if needed
-      tunnel = new Tunnel(config);
+      tunnel = new iTunnel(config);
 
       return tunnel
         .initialize()
@@ -33,7 +49,7 @@ export default {
         })
         .catch((err) => {
           analytics.mark("sauce-open-tunnels", "failed");
-          return new Promise((reject) => {
+          return new Promise((resolve, reject) => {
             reject(err);
           });
         });
@@ -53,7 +69,13 @@ export default {
     }
   },
 
-  teardown: () => {
+  teardown: (mocks = null) => {
+    if (mocks && mocks.config) {
+      config = mocks.config;
+    }
+
+    logger.log("Tearing pre-requisites down");
+
     // close tunnel if needed
     if (tunnel && config.useTunnels) {
       return tunnel
@@ -69,14 +91,24 @@ export default {
   },
 
   stage: (callback) => {
+    logger.log("Staging before test run");
+
     locks.acquire(callback);
   },
 
   wrapup: (info, callback) => {
+    logger.log("Cleaning up after test run");
+
     locks.release(info, callback);
   },
 
-  execute: (testRun, options) => {
-    return fork(testRun.getCommand(), testRun.getArguments(), options);
+  execute: (testRun, options, mocks = null) => {
+    let ifork = fork;
+
+    if (mocks && mocks.fork) {
+      ifork = mocks.fork;
+    }
+
+    return ifork(testRun.getCommand(), testRun.getArguments(), options);
   }
 };

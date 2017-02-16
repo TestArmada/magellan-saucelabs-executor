@@ -6,13 +6,13 @@ import _ from "lodash";
 import logger from "../../lib/logger";
 
 // eat console logs
-// logger.output = {
-//   log() { },
-//   error() { },
-//   debug() { },
-//   warn() { },
-//   loghelp() { }
-// };
+logger.output = {
+  log() { },
+  error() { },
+  debug() { },
+  warn() { },
+  loghelp() { }
+};
 
 chai.use(chaiAsPromise);
 
@@ -112,6 +112,26 @@ describe("Profile", () => {
           expect(result.nightwatchEnv).to.equal("sauce");
           expect(result.id).to.equal("iphone_9_2_iOS_iPhone_Simulator");
         });
+    });
+  });
+
+  describe("listBrowsers", () => {
+    it("from sauce", (done) => {
+      return profile
+        .listBrowsers({}, (err, browserTable) => {
+          expect(err).to.equal(null);
+          expect(browserTable.length).to.be.above(0);
+          done();
+        });
+    });
+
+    it("from local file", (done) => {
+      return profile
+        .listBrowsers({}, (err, browserTable) => {
+          expect(err).to.equal(null);
+          expect(browserTable.length).to.be.above(0);
+          done();
+        }, { device_additions: "./test/src/devices.json" });
     });
   });
 

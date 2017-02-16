@@ -1,0 +1,15 @@
+[
+  {
+    "id": "SamsungGalaxyS5",
+    "family": "Webkit Android",
+    "desiredCapabilities": {
+      "browserName": "FAKE_BROWSER",
+      "platform": "Android",
+      "version": "4.4",
+      "deviceName": "Samsung Galaxy S5 Device",
+      "device-orientation": "portrait",
+      "platformName": "Android",
+      "platformVersion": "4.4"
+    }
+  }
+]

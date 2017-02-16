@@ -6,6 +6,7 @@ import guid from "./util/guid";
 
 export default {
   getConfig: () => {
+    logger.debug("executor config: " + JSON.stringify(settings.config));
     return settings.config;
   },
 
