@@ -3,10 +3,9 @@ import { fork } from "child_process";
 import _ from "lodash";
 import Locks from "./locks";
 import Tunnel from "./tunnel";
-import guid from "./util/guid";
 import logger from "./logger";
 import settings from "./settings";
-
+import analytics from "./global_analytics";
 
 const config = settings.config;
 
