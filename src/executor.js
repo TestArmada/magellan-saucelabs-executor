@@ -28,7 +28,6 @@ export default {
     }
 
     locks = new ILocks(config);
-    logger.log("Setting pre-requisites up");
 
     if (config.useTunnels) {
       // create new tunnel if needed
@@ -58,7 +57,7 @@ export default {
           if (config.sharedSauceParentAccount) {
             tunnelAnnouncement = `${config.sharedSauceParentAccount }/${ tunnelAnnouncement}`;
           }
-          logger.log(`Connected to sauce tunnel pool with tunnel [${ tunnelAnnouncement }]`);
+          logger.log(`Connected to sauce tunnel [${ tunnelAnnouncement }]`);
         } else {
           logger.log("Connected to sauce without tunnel");
         }
@@ -71,8 +70,6 @@ export default {
     if (mocks && mocks.config) {
       config = mocks.config;
     }
-
-    logger.log("Tearing pre-requisites down");
 
     // close tunnel if needed
     if (tunnel && config.useTunnels) {
@@ -89,14 +86,10 @@ export default {
   },
 
   stage: (callback) => {
-    logger.log("Staging before test run");
-
     locks.acquire(callback);
   },
 
   wrapup: (info, callback) => {
-    logger.log("Cleaning up after test run");
-
     locks.release(info, callback);
   },
 
