@@ -1,6 +1,4 @@
 import { fork } from "child_process";
-
-import _ from "lodash";
 import Locks from "./locks";
 import Tunnel from "./tunnel";
 import logger from "./logger";
@@ -14,27 +12,27 @@ let locks = null;
 
 export default {
   setup: (mocks = null) => {
-    let iLocks = Locks;
-    let iTunnel = Tunnel;
+    let ILocks = Locks;
+    let ITunnel = Tunnel;
 
     if (mocks) {
       if (mocks.Locks) {
-        iLocks = mocks.Locks;
+        ILocks = mocks.Locks;
       }
       if (mocks.Tunnel) {
-        iTunnel = mocks.Tunnel;
+        ITunnel = mocks.Tunnel;
       }
       if (mocks.config) {
         config = mocks.config;
       }
     }
 
-    locks = new iLocks(config);
+    locks = new ILocks(config);
     logger.log("Setting pre-requisites up");
 
     if (config.useTunnels) {
       // create new tunnel if needed
-      tunnel = new iTunnel(config);
+      tunnel = new ITunnel(config);
 
       return tunnel
         .initialize()
@@ -45,7 +43,7 @@ export default {
         .then(() => {
           analytics.mark("sauce-open-tunnels");
           logger.log("Sauce tunnel is opened!  Continuing...");
-          logger.log("Assigned tunnel [" + config.sauceTunnelId + "] to all workers");
+          logger.log(`Assigned tunnel [${ config.sauceTunnelId }] to all workers`);
         })
         .catch((err) => {
           analytics.mark("sauce-open-tunnels", "failed");
@@ -58,9 +56,9 @@ export default {
         if (config.sauceTunnelId) {
           let tunnelAnnouncement = config.sauceTunnelId;
           if (config.sharedSauceParentAccount) {
-            tunnelAnnouncement = config.sharedSauceParentAccount + "/" + tunnelAnnouncement;
+            tunnelAnnouncement = `${config.sharedSauceParentAccount }/${ tunnelAnnouncement}`;
           }
-          logger.log("Connected to sauce tunnel pool with tunnel [" + tunnelAnnouncement + "]");
+          logger.log(`Connected to sauce tunnel pool with tunnel [${ tunnelAnnouncement }]`);
         } else {
           logger.log("Connected to sauce without tunnel");
         }

@@ -12,8 +12,8 @@ export default class Locks {
     }
 
     if (this.options.locksServerLocation) {
-      logger.log("Using locks server at " + this.options.locksServerLocation
-        + " for VM traffic control.");
+      logger.log(`Using locks server at ${this.options.locksServerLocation
+        } for VM traffic control.`);
     }
   }
 
@@ -32,8 +32,9 @@ export default class Locks {
       const poll = () => {
         logger.debug("asking for VM..");
 
-        this.request.post({
-          url: this.options.locksServerLocation + "/claim",
+        /*eslint-disable consistent-return*/
+        return this.request.post({
+          url: `${this.options.locksServerLocation}/claim`,
           timeout: this.options.locksRequestTimeout,
           form: {}
         }, (error, response, body) => {
@@ -44,7 +45,7 @@ export default class Locks {
             const result = JSON.parse(body);
             if (result) {
               if (result.accepted) {
-                logger.debug("VM claim accepted, token: " + result.token);
+                logger.debug(`VM claim accepted, token: ${result.token}`);
 
                 return callback(null, { token: result.token });
               } else {
@@ -53,8 +54,8 @@ export default class Locks {
                 return callback(new Error("Request not accepted"));
               }
             } else {
-              return callback(new Error("Result from locks server is invalid or empty: '"
-                + result + "'"));
+              return callback(new Error(`Result from locks server is invalid or empty: '${
+                result}'`));
             }
           } catch (e) {
             // NOTE: There are several errors that can happen in the above code:
@@ -70,12 +71,12 @@ export default class Locks {
             // time before we panic and start failing tests due to an outage.
             if (Date.now() - pollingStartTime > this.options.locksOutageTimeout) {
               // we've been polling for too long. Bail!
-              return callback(new Error("Gave up trying to get "
-                + "a saucelabs VM from locks server. " + e));
+              return callback(new Error(`${"Gave up trying to get "
+                + "a saucelabs VM from locks server. "}${e}`));
             } else {
-              logger.debug("Error from locks server, tolerating error and" +
-                " waiting " + this.options.locksPollingInterval +
-                "ms before trying again");
+              logger.debug(`${"Error from locks server, tolerating error and" +
+                " waiting "}${this.options.locksPollingInterval
+                }ms before trying again`);
               setTimeout(poll, this.options.locksPollingInterval);
             }
           }
@@ -90,14 +91,14 @@ export default class Locks {
 
   release(token, callback) {
     if (this.options.locksServerLocation) {
-      this.request({
+      return this.request({
         method: "POST",
         json: true,
         timeout: this.options.locksRequestTimeout,
         body: {
           token
         },
-        url: this.options.locksServerLocation + "/release"
+        url: `${this.options.locksServerLocation}/release`
       }, () => {
         // TODO: decide whether we care about an error at this stage. We're releasing
         // this worker whether the remote release is successful or not, since it will
@@ -108,4 +109,4 @@ export default class Locks {
       return callback();
     }
   }
-};
+}

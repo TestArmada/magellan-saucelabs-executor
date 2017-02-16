@@ -6,10 +6,11 @@ import guid from "./util/guid";
 
 export default {
   getConfig: () => {
-    logger.debug("executor config: " + JSON.stringify(settings.config));
+    logger.debug(`executor config: ${JSON.stringify(settings.config)}`);
     return settings.config;
   },
 
+  /*eslint-disable complexity*/
   validateConfig: (opts, argvMock = null, envMock = null) => {
     // let config = _.assign({}, settings.config);
     let runArgv = argv;
@@ -37,8 +38,10 @@ export default {
     settings.config.locksServerLocation = env.LOCKS_SERVER;
 
     // Remove trailing / in locks server location if it's present.
-    if (typeof settings.config.locksServerLocation === "string" && settings.config.locksServerLocation.length > 0) {
-      if (settings.config.locksServerLocation.charAt(settings.config.locksServerLocation.length - 1) === "/") {
+    if (typeof settings.config.locksServerLocation === "string"
+      && settings.config.locksServerLocation.length > 0) {
+      if (settings.config.locksServerLocation.charAt(
+        settings.config.locksServerLocation.length - 1) === "/") {
         settings.config.locksServerLocation = settings.config.locksServerLocation.substr(0,
           settings.config.locksServerLocation.length - 1);
       }
@@ -67,12 +70,12 @@ export default {
       _.forEach(parameterWarnings, (v, k) => {
         if (!settings.config[k]) {
           if (v.required) {
-            logger.err("Error! Sauce requires " + k + " to be set. Check if the"
-              + " environment variable $" + v.envKey + " is defined.");
+            logger.err(`Error! Sauce requires ${k} to be set. Check if the`
+              + ` environment variable $${v.envKey} is defined.`);
             valid = false;
           } else {
-            logger.warn("Warning! No " + k + " is set. This is set via the"
-              + " environment variable $" + v.envKey + " . This isn't required, but can cause "
+            logger.warn(`Warning! No ${k} is set. This is set via the`
+              + ` environment variable $${v.envKey} . This isn't required, but can cause `
               + "problems with Sauce if not set");
           }
         }

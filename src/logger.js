@@ -1,4 +1,4 @@
-"use strict";
+
 
 import { argv } from "yargs";
 import util from "util";

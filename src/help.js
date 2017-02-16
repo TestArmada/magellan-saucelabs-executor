@@ -31,6 +31,7 @@ export default {
     "visible": true,
     "type": "string",
     "example": "testsauceaccount",
-    "description": "Specify parent account name if existing shared secure tunnel is in use (exclusive with --sauce_create_tunnels)"
+    "description": "Specify parent account name if existing shared secure tunnel is "
+    + " in use (exclusive with --sauce_create_tunnels)"
   }
 };

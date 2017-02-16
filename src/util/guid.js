@@ -1,4 +1,4 @@
-"use strict";
+
 
 const RAND_MAX = 9999999999999999;
 const STRNUM_BASE = 16;

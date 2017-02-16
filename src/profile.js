@@ -26,7 +26,7 @@ export default {
               id: runArgv.sauce_browser
             };
 
-            logger.debug("detected profile: " + JSON.stringify(p));
+            logger.debug(`detected profile: ${ JSON.stringify(p)}`);
 
             resolve(p);
           } else if (runArgv.sauce_browsers) {
@@ -48,7 +48,7 @@ export default {
               returnBrowsers.push(p);
             });
 
-            logger.debug("detected profiles: " + JSON.stringify(returnBrowsers));
+            logger.debug(`detected profiles: ${ JSON.stringify(returnBrowsers)}`);
 
             resolve(returnBrowsers);
           } else {
@@ -92,8 +92,8 @@ export default {
 
             resolve(p);
           } catch (e) {
-            reject("Executor sauce cannot resolve profile "
-              + profile);
+            reject(`Executor sauce cannot resolve profile ${
+               profile}`);
           }
         });
       });
@@ -132,7 +132,7 @@ export default {
         callback(null, browserTable);
       })
       .catch((err) => {
-        logger.err("Couldn't fetch sauce browsers. Error: " + err);
+        logger.err(`Couldn't fetch sauce browsers. Error: ${ err}`);
         logger.err(err.stack);
         callback(err);
       });
