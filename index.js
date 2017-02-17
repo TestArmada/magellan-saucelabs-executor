@@ -21,5 +21,5 @@ module.exports = {
   teardown: executor.teardown,
   stage: executor.stage,
   wrapup: executor.wrapup,
-  execute: executor.execute,
+  execute: executor.execute
 };

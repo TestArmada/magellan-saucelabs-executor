@@ -99,6 +99,39 @@ describe("Configuration", () => {
         expect(config.locksRequestTimeout).to.equal(2500);
       });
 
+      it("succeed with isEnabled", () => {
+        let argvMock = {
+          sauce_browsers: "chrome_latest_Windows_10_Desktop",
+          sauce_browser: "chrome_latest_Windows_10_Desktop",
+          sauce_create_tunnels: true
+        };
+        let envMock = {
+          SAUCE_USERNAME: "FAKE_USERNAME",
+          SAUCE_ACCESS_KEY: "FAKE_ACCESSKEY",
+          SAUCE_CONNECT_VERSION: "FAKE_VERSION",
+          LOCKS_SERVER: "FAKE_LOCKSERVER/",
+          SAUCE_TUNNEL_CLOSE_TIMEOUT: 400,
+          SAUCE_TUNNEL_FAST_FAIL_REGEXPS: "a,b,c"
+        };
+
+        const config = configuration.validateConfig({ isEnabled: true }, argvMock, envMock);
+
+        expect(config.username).to.equal("FAKE_USERNAME");
+        expect(config.accessKey).to.equal("FAKE_ACCESSKEY");
+        expect(config.sauceConnectVersion).to.equal("FAKE_VERSION");
+        expect(config.sauceTunnelId).to.be.a("string");
+        expect(config.sharedSauceParentAccount).to.equal(undefined);
+        expect(config.tunnelTimeout).to.equal(400);
+        expect(config.useTunnels).to.equal(true);
+        expect(config.fastFailRegexps).to.equal("a,b,c");
+        expect(config.locksServerLocation).to.equal("FAKE_LOCKSERVER");
+
+        expect(config.maxTunnels).to.equal(1);
+        expect(config.locksOutageTimeout).to.equal(1000 * 60 * 5);
+        expect(config.locksPollingInterval).to.equal(2500);
+        expect(config.locksRequestTimeout).to.equal(2500);
+      });
+
       it("missing SAUCE_USERNAME", () => {
         let envMock = {
           // SAUCE_USERNAME: "FAKE_USERNAME",

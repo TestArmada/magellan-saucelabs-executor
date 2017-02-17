@@ -5,6 +5,7 @@ import settings from "./settings";
 import guid from "./util/guid";
 
 export default {
+
   getConfig: () => {
     logger.debug(`executor config: ${JSON.stringify(settings.config)}`);
     return settings.config;
@@ -64,7 +65,8 @@ export default {
 
     // Validate configuration if we have --sauce
     if (runArgv.sauce_browsers
-      || runArgv.sauce_browser) {
+      || runArgv.sauce_browser
+      || opts.isEnabled) {
       let valid = true;
 
       _.forEach(parameterWarnings, (v, k) => {
