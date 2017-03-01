@@ -4,6 +4,17 @@ import listSauceCliBrowsers from "guacamole/src/cli_list";
 import { argv } from "yargs";
 import logger from "./logger";
 
+const _patchFirefox = (capabilities) => {
+  if (capabilities.browserName === "firefox"
+    && parseInt(capabilities.version) >= 48) {
+    capabilities.marionette = true;
+    capabilities.javascriptEnabled = true;
+    capabilities.seleniumVersion = "3.0.1";
+  }
+
+  return capabilities;
+};
+
 export default {
   getProfiles: (opts, argvMock = null) => {
     let runArgv = argv;
@@ -18,9 +29,9 @@ export default {
         return new Promise((resolve) => {
           if (runArgv.sauce_browser) {
             const p = {
-              desiredCapabilities: SauceBrowsers.get({
+              desiredCapabilities: _patchFirefox(SauceBrowsers.get({
                 id: runArgv.sauce_browser
-              })[0],
+              })[0]),
               executor: "sauce",
               nightwatchEnv: "sauce",
               id: runArgv.sauce_browser
@@ -36,9 +47,9 @@ export default {
             _.forEach(tempBrowsers, (browser) => {
               const b = browser.trim();
               const p = {
-                desiredCapabilities: SauceBrowsers.get({
+                desiredCapabilities: _patchFirefox(SauceBrowsers.get({
                   id: b
-                })[0],
+                })[0]),
                 executor: "sauce",
                 nightwatchEnv: "sauce",
                 // id is for magellan reporter
@@ -81,7 +92,7 @@ export default {
       .then(() => {
         return new Promise((resolve, reject) => {
           try {
-            const desiredCapabilities = SauceBrowsers.get(prof)[0];
+            const desiredCapabilities = _patchFirefox(SauceBrowsers.get(prof)[0]);
             // add executor info back to capabilities
             const p = {
               desiredCapabilities,
