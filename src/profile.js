@@ -4,9 +4,11 @@ import listSauceCliBrowsers from "guacamole/src/cli_list";
 import { argv } from "yargs";
 import logger from "./logger";
 
+const FIREFOX_MARIONETTE = 48;
+
 const _patchFirefox = (capabilities) => {
   if (capabilities.browserName === "firefox"
-    && parseInt(capabilities.version) >= 48) {
+    && parseInt(capabilities.version) >= FIREFOX_MARIONETTE) {
     capabilities.marionette = true;
     capabilities.javascriptEnabled = true;
     capabilities.seleniumVersion = "3.0.1";
