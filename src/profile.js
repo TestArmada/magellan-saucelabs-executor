@@ -18,6 +18,31 @@ const _patchFirefox = (capabilities) => {
 };
 
 export default {
+  getNightwatchConfig: (profile, sauceSettings) => {
+    const capabilities = _.assign({}, profile.desiredCapabilities);
+
+    if (sauceSettings.sauceTunnelId) {
+      capabilities["tunnel-identifier"] = sauceSettings.sauceTunnelId;
+      if (sauceSettings.sharedSauceParentAccount) {
+        // if tunnel is shared by parent account
+        capabilities["parent-tunnel"] = sauceSettings.sharedSauceParentAccount;
+      }
+    } else {
+      // This property may exist, so blow it away
+      delete capabilities["tunnel-identifier"];
+    }
+
+    /*eslint-disable camelcase*/
+    const config = {
+      desiredCapabilities: capabilities,
+      username: sauceSettings.username,
+      access_key: sauceSettings.accessKey
+    };
+
+    logger.debug(`executor config: ${JSON.stringify(config)}`);
+    return config;
+  },
+
   getProfiles: (opts, argvMock = null) => {
     let runArgv = argv;
 
@@ -39,7 +64,7 @@ export default {
               id: runArgv.sauce_browser
             };
 
-            logger.debug(`detected profile: ${ JSON.stringify(p)}`);
+            logger.debug(`detected profile: ${JSON.stringify(p)}`);
 
             resolve(p);
           } else if (runArgv.sauce_browsers) {
@@ -61,7 +86,7 @@ export default {
               returnBrowsers.push(p);
             });
 
-            logger.debug(`detected profiles: ${ JSON.stringify(returnBrowsers)}`);
+            logger.debug(`detected profiles: ${JSON.stringify(returnBrowsers)}`);
 
             resolve(returnBrowsers);
           } else {
@@ -106,7 +131,7 @@ export default {
             resolve(p);
           } catch (e) {
             reject(`Executor sauce cannot resolve profile ${
-               profile}`);
+              profile}`);
           }
         });
       });
@@ -145,7 +170,7 @@ export default {
         callback(null, browserTable);
       })
       .catch((err) => {
-        logger.err(`Couldn't fetch sauce browsers. Error: ${ err}`);
+        logger.err(`Couldn't fetch sauce browsers. Error: ${err}`);
         logger.err(err.stack);
         callback(err);
       });
