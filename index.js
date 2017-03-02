@@ -18,9 +18,10 @@ module.exports = {
   getCapabilities: profile.getCapabilities,
   listBrowsers: profile.listBrowsers,
 
-  setup: executor.setup,
-  teardown: executor.teardown,
-  stage: executor.stage,
-  wrapup: executor.wrapup,
-  execute: executor.execute
+  setupRunner: executor.setupRunner,
+  teardownRunner: executor.teardownRunner,
+  setupTest: executor.setupTest,
+  teardownTest: executor.teardownTest,
+  execute: executor.execute,
+  summerizeTest: executor.summerizeTest
 };

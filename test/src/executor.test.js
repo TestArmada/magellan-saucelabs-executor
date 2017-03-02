@@ -35,7 +35,7 @@ describe("Executor", () => {
     expect(r).to.equal(1);
   });
 
-  describe("setup", () => {
+  describe("setupRunner", () => {
     let mocks;
 
     beforeEach(() => {
@@ -62,9 +62,9 @@ describe("Executor", () => {
       };
 
       return executor
-        .setup(mocks)
+        .setupRunner(mocks)
         .then(() => { })
-        .catch(err => assert(false, "executor setup isn't successful for no create tunnel config"));
+        .catch(err => assert(false, "executor setupRunner isn't successful for no create tunnel config"));
     });
 
     it("use existing tunnel", () => {
@@ -75,9 +75,9 @@ describe("Executor", () => {
       };
 
       return executor
-        .setup(mocks)
+        .setupRunner(mocks)
         .then(() => { })
-        .catch(err => assert(false, "executor setup isn't successful for use existing tunnel config"));
+        .catch(err => assert(false, "executor setupRunner isn't successful for use existing tunnel config"));
     });
 
     it("create new tunnel", () => {
@@ -86,9 +86,9 @@ describe("Executor", () => {
       };
 
       return executor
-        .setup(mocks)
+        .setupRunner(mocks)
         .then(() => { })
-        .catch(err => assert(false, "executor setup isn't successful for create new tunnel config"));
+        .catch(err => assert(false, "executor setupRunner isn't successful for create new tunnel config"));
     });
 
     it("create new tunnel failed in initialization", () => {
@@ -103,8 +103,8 @@ describe("Executor", () => {
       };
 
       return executor
-        .setup(mocks)
-        .then(() => assert(false, "executor setup isn't successful"))
+        .setupRunner(mocks)
+        .then(() => assert(false, "executor setupRunner isn't successful"))
         .catch(err => expect(err).to.equal("initialization error"));
     });
 
@@ -120,13 +120,13 @@ describe("Executor", () => {
       };
 
       return executor
-        .setup(mocks)
-        .then(() => assert(false, "executor setup isn't successful"))
+        .setupRunner(mocks)
+        .then(() => assert(false, "executor setupRunner isn't successful"))
         .catch(err => expect(err).to.equal("open error"));
     });
   });
 
-  describe("teardown", () => {
+  describe("teardownRunner", () => {
     it("no create tunnel", () => {
       let mocks = {
         Locks: class Locks {
@@ -145,9 +145,9 @@ describe("Executor", () => {
       };
 
       return executor
-        .setup(mocks)
-        .then(() => executor.teardown())
-        .catch(err => assert(false, "executor teardown isn't successful for no create tunnel config"));
+        .setupRunner(mocks)
+        .then(() => executor.teardownRunner())
+        .catch(err => assert(false, "executor teardownRunner isn't successful for no create tunnel config"));
     });
 
     it("use tunnel", () => {
@@ -171,13 +171,13 @@ describe("Executor", () => {
       };
 
       return executor
-        .setup(mocks)
-        .then(() => executor.teardown(mocks))
-        .catch(err => assert(false, "executor teardown isn't successful for use tunnel config"));
+        .setupRunner(mocks)
+        .then(() => executor.teardownRunner(mocks))
+        .catch(err => assert(false, "executor teardownRunner isn't successful for use tunnel config"));
     });
   });
 
-  it("stage", () => {
+  it("setupTest", () => {
     let mocks = {
       Locks: class Locks {
         constructor(config) { }
@@ -195,15 +195,15 @@ describe("Executor", () => {
     };
 
     return executor
-      .setup(mocks)
+      .setupRunner(mocks)
       .then(() => {
-        executor.stage((num) => {
+        executor.setupTest((num) => {
           expect(num).to.equal(1);
         });
       });
   });
 
-  it("wrapup", () => {
+  it("teardownTest", () => {
     let mocks = {
       Locks: class Locks {
         constructor(config) { }
@@ -221,9 +221,9 @@ describe("Executor", () => {
     };
 
     return executor
-      .setup(mocks)
+      .setupRunner(mocks)
       .then(() => {
-        executor.wrapup("FAKE_TOKEN", (info) => {
+        executor.teardownTest("FAKE_TOKEN", (info) => {
           expect(info).to.equal("FAKE_TOKEN");
         });
       });
