@@ -13,6 +13,7 @@ module.exports = {
   getConfig: configuration.getConfig,
   validateConfig: configuration.validateConfig,
 
+  getNightwatchConfig: profile.getNightwatchConfig,
   getProfiles: profile.getProfiles,
   getCapabilities: profile.getCapabilities,
   listBrowsers: profile.listBrowsers,
