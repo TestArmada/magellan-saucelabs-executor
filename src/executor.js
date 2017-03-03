@@ -106,20 +106,20 @@ export default {
 
   /*eslint-disable consistent-return*/
   summerizeTest: (magellanBuildId, testResult, callback) => {
-    const sessionId = testResult.metadata.sessionId;
-    const requestPath = `/rest/v1/${config.username}/jobs/${sessionId}`;
-    const data = JSON.stringify({
-      "passed": testResult.result,
-      // TODO: remove this
-      "build": magellanBuildId,
-      "public": "team"
-    });
-
-    logger.debug("Data posting to SauceLabs job:");
-    logger.debug(JSON.stringify(data));
-
     try {
+      const sessionId = testResult.metadata.sessionId;
+      const requestPath = `/rest/v1/${config.username}/jobs/${sessionId}`;
+      const data = JSON.stringify({
+        "passed": testResult.result,
+        // TODO: remove this
+        "build": magellanBuildId,
+        "public": "team"
+      });
+
+      logger.debug("Data posting to SauceLabs job:");
+      logger.debug(JSON.stringify(data));
       logger.debug(`Updating saucelabs ${requestPath}`);
+
       const req = https.request({
         hostname: "saucelabs.com",
         path: requestPath,

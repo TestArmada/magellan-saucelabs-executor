@@ -128,6 +128,14 @@ export default {
               id: prof.id
             };
 
+            // for appium test
+            if (profile.appium) {
+              p.desiredCapabilities = _.merge(p.desiredCapabilities, profile.appium);
+
+              if (p.desiredCapabilities.app) {
+                delete p.desiredCapabilities.browserName;
+              }
+            }
             resolve(p);
           } catch (e) {
             reject(`Executor sauce cannot resolve profile ${
