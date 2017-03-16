@@ -139,7 +139,7 @@ export default {
             resolve(p);
           } catch (e) {
             reject(`Executor sauce cannot resolve profile ${
-              profile}`);
+              JSON.stringify(profile)}`);
           }
         });
       });
