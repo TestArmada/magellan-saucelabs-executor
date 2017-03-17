@@ -57,5 +57,5 @@ $ ./node_modules/.bin/magellan --sauce_browser chrome_latest_Windows_10_Desktop 
 
 To run test in latest chrome, latest firefox on Windows10 and safari 9 on MacOS 10.11
 ```
-$ ./node_modules/.bin/magellan --sauce_browser chrome_latest_Windows_10_Desktop,firefox_latest_Windows_10_Desktop,safari_9_OS_X_10_11_Desktop --test xxx
+$ ./node_modules/.bin/magellan --sauce_browsers chrome_latest_Windows_10_Desktop,firefox_latest_Windows_10_Desktop,safari_9_OS_X_10_11_Desktop --test xxx
 ```
