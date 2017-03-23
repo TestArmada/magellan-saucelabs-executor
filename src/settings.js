@@ -22,8 +22,8 @@ const config = {
 
   maxTunnels: 1,
   locksOutageTimeout: 1000 * 60 * 5,
-  locksPollingInterval: 2500,
-  locksRequestTimeout: 2500
+  locksPollingInterval: 5000,
+  locksRequestTimeout: 5000
 };
 
 
