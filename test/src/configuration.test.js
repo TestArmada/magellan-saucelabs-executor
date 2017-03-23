@@ -34,8 +34,8 @@ describe("Configuration", () => {
 
     expect(config.maxTunnels).to.equal(1);
     expect(config.locksOutageTimeout).to.equal(1000 * 60 * 5);
-    expect(config.locksPollingInterval).to.equal(2500);
-    expect(config.locksRequestTimeout).to.equal(2500);
+    expect(config.locksPollingInterval).to.equal(5000);
+    expect(config.locksRequestTimeout).to.equal(5000);
   });
 
   describe("validateConfig", () => {
@@ -56,8 +56,8 @@ describe("Configuration", () => {
 
       expect(config.maxTunnels).to.equal(1);
       expect(config.locksOutageTimeout).to.equal(1000 * 60 * 5);
-      expect(config.locksPollingInterval).to.equal(2500);
-      expect(config.locksRequestTimeout).to.equal(2500);
+      expect(config.locksPollingInterval).to.equal(5000);
+      expect(config.locksRequestTimeout).to.equal(5000);
     });
 
     describe("executor enabled", () => {
@@ -95,8 +95,8 @@ describe("Configuration", () => {
 
         expect(config.maxTunnels).to.equal(1);
         expect(config.locksOutageTimeout).to.equal(1000 * 60 * 5);
-        expect(config.locksPollingInterval).to.equal(2500);
-        expect(config.locksRequestTimeout).to.equal(2500);
+        expect(config.locksPollingInterval).to.equal(5000);
+        expect(config.locksRequestTimeout).to.equal(5000);
       });
 
       it("succeed with isEnabled", () => {
@@ -128,8 +128,8 @@ describe("Configuration", () => {
 
         expect(config.maxTunnels).to.equal(1);
         expect(config.locksOutageTimeout).to.equal(1000 * 60 * 5);
-        expect(config.locksPollingInterval).to.equal(2500);
-        expect(config.locksRequestTimeout).to.equal(2500);
+        expect(config.locksPollingInterval).to.equal(5000);
+        expect(config.locksRequestTimeout).to.equal(5000);
       });
 
       it("missing SAUCE_USERNAME", () => {
