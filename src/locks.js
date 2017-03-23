@@ -83,7 +83,9 @@ export default class Locks {
         });
       };
 
-      return poll();
+      return setTimeout(() => {
+        poll();
+      }, this.options.locksPollingInterval);
     } else {
       return callback();
     }
