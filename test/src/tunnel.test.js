@@ -22,10 +22,12 @@ describe("Tunnel", () => {
   let tunnel;
 
   let options = {
-    username: "FAKE_USERNAME",
-    accessKey: "FAKE_ACCESSKEY",
-    sauceTunnelId: "FAKE_TUNNELID",
-    fastFailRegexps: "FAKE_EXP"
+    tunnel: {
+      username: "FAKE_USERNAME",
+      accessKey: "FAKE_ACCESSKEY",
+      tunnelIdentifier: "FAKE_TUNNELID",
+      fastFailRegexps: "FAKE_EXP"
+    }
   };
 
   let sauceConnectLauncherMock = {
@@ -39,10 +41,10 @@ describe("Tunnel", () => {
   });
 
   it("constructor", () => {
-    expect(tunnel.options.username).to.equal("FAKE_USERNAME");
-    expect(tunnel.options.accessKey).to.equal("FAKE_ACCESSKEY");
-    expect(tunnel.options.sauceTunnelId).to.equal("FAKE_TUNNELID");
-    expect(tunnel.options.fastFailRegexps).to.equal("FAKE_EXP");
+    expect(tunnel.options.tunnel.username).to.equal("FAKE_USERNAME");
+    expect(tunnel.options.tunnel.accessKey).to.equal("FAKE_ACCESSKEY");
+    expect(tunnel.options.tunnel.tunnelIdentifier).to.equal("FAKE_TUNNELID");
+    expect(tunnel.options.tunnel.fastFailRegexps).to.equal("FAKE_EXP");
   });
 
   describe("initialize", () => {
@@ -53,7 +55,7 @@ describe("Tunnel", () => {
     });
 
     it("missing username", () => {
-      tunnel = new Tunnel({}, sauceConnectLauncherMock);
+      tunnel = new Tunnel({ tunnel: {} }, sauceConnectLauncherMock);
 
       return tunnel
         .initialize()
@@ -65,7 +67,7 @@ describe("Tunnel", () => {
     });
 
     it("missing accesskey", () => {
-      tunnel = new Tunnel({ username: "FAKE_USERNAME" }, sauceConnectLauncherMock);
+      tunnel = new Tunnel({ tunnel: { username: "FAKE_USERNAME" } }, sauceConnectLauncherMock);
 
       return tunnel
         .initialize()

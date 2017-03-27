@@ -1,18 +1,33 @@
 import { argv } from "yargs";
 import _ from "lodash";
+import path from "path";
 import logger from "./logger";
 import settings from "./settings";
 import guid from "./util/guid";
 
-export default {
+const _loadConfig = (filename) => {
+  const filepath = path.resolve(process.cwd() + path.sep + filename);
+  try {
+    /*eslint-disable global-require*/
+    const config = require(filepath);
+    logger.log(`Loaded tunnel config file ${filename}`);
+    logger.debug(`Tunnel config from ${filename}:`);
+    logger.debug(`${JSON.stringify(config)}`);
+    return _.cloneDeep(config);
+  } catch (err) {
+    logger.err(`Cannot load tunnel config file from ${filename}`);
+    logger.err(err);
+    throw new Error(err);
+  }
+};
 
+export default {
   getConfig: () => {
     return settings.config;
   },
 
   /*eslint-disable complexity*/
   validateConfig: (opts, argvMock = null, envMock = null) => {
-    // let config = _.assign({}, settings.config);
     let runArgv = argv;
     let env = process.env;
 
@@ -24,17 +39,43 @@ export default {
       env = envMock;
     }
 
-    // required:
-    settings.config.username = env.SAUCE_USERNAME;
-    settings.config.accessKey = env.SAUCE_ACCESS_KEY;
-    settings.config.sauceConnectVersion = env.SAUCE_CONNECT_VERSION;
-    // optional:
-    settings.config.sauceTunnelId = runArgv.sauce_tunnel_id;
-    settings.config.sharedSauceParentAccount = runArgv.shared_sauce_parent_account;
-    settings.config.useTunnels = !!runArgv.sauce_create_tunnels;
-    settings.config.tunnelTimeout = env.SAUCE_TUNNEL_CLOSE_TIMEOUT;
-    settings.config.fastFailRegexps = env.SAUCE_TUNNEL_FAST_FAIL_REGEXPS;
+    if (runArgv.sauce_tunnel_config) {
+      settings.config.tunnel = _loadConfig(runArgv.sauce_tunnel_config);
+    }
 
+    // override sauce configurations from default source
+    // required:
+    if (env.SAUCE_USERNAME) {
+      settings.config.tunnel.username = env.SAUCE_USERNAME;
+    }
+
+    if (env.SAUCE_ACCESS_KEY) {
+      settings.config.tunnel.accessKey = env.SAUCE_ACCESS_KEY;
+    }
+
+    if (env.SAUCE_CONNECT_VERSION) {
+      settings.config.tunnel.connectVersion = env.SAUCE_CONNECT_VERSION;
+    }
+    // optional:
+    if (runArgv.sauce_tunnel_id) {
+      settings.config.tunnel.tunnelIdentifier = runArgv.sauce_tunnel_id;
+    }
+
+    if (env.SAUCE_TUNNEL_FAST_FAIL_REGEXPS
+      && !settings.config.tunnel.fastFailRegexps) {
+      // only if fastFailRegexps isn't set anywhere
+      settings.config.tunnel.fastFailRegexps = env.SAUCE_TUNNEL_FAST_FAIL_REGEXPS;
+    }
+
+    if (runArgv.shared_sauce_parent_account) {
+      settings.config.sharedSauceParentAccount = runArgv.shared_sauce_parent_account;
+    }
+
+    if (runArgv.sauce_create_tunnels) {
+      settings.config.useTunnels = !!runArgv.sauce_create_tunnels;
+    }
+
+    // locks config
     settings.config.locksServerLocation = env.LOCKS_SERVER;
 
     // Remove trailing / in locks server location if it's present.
@@ -56,7 +97,7 @@ export default {
         required: true,
         envKey: "SAUCE_ACCESS_KEY"
       },
-      sauceConnectVersion: {
+      connectVersion: {
         required: false,
         envKey: "SAUCE_CONNECT_VERSION"
       }
@@ -69,7 +110,7 @@ export default {
       let valid = true;
 
       _.forEach(parameterWarnings, (v, k) => {
-        if (!settings.config[k]) {
+        if (!settings.config.tunnel[k]) {
           if (v.required) {
             logger.err(`Error! Sauce requires ${k} to be set. Check if the`
               + ` environment variable $${v.envKey} is defined.`);
@@ -98,9 +139,9 @@ export default {
       }
 
       // after verification we want to add sauce_tunnel_id if it's null till now
-      if (!settings.config.sauceTunnelId && settings.config.useTunnels) {
+      if (!settings.config.tunnel.tunnelIdentifier && settings.config.useTunnels) {
         // auto generate tunnel id
-        settings.config.sauceTunnelId = guid();
+        settings.config.tunnel.tunnelIdentifier = guid();
       }
 
       logger.debug("Sauce configuration: ");

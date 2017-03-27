@@ -6,21 +6,20 @@ const TEMP_DIR = path.resolve(argvs.temp_dir || "./temp");
 
 /*eslint-disable no-magic-numbers*/
 const config = {
-  // required:
-  username: null,
-  accessKey: null,
-  sauceConnectVersion: null,
+  tunnel: {
+    // required:
+    username: null,
+    accessKey: null,
+    connectVersion: null,
 
-  // optional:
-  sauceTunnelId: null,
+    // optional:
+    tunnelIdentifier: null,
+    fastFailRegexps: null
+  },
   sharedSauceParentAccount: null,
-  tunnelTimeout: null,
-  useTunnels: null,
-  fastFailRegexps: null,
+  useTunnels: false,
 
   locksServerLocation: null,
-
-  maxTunnels: 1,
   locksOutageTimeout: 1000 * 60 * 5,
   locksPollingInterval: 5000,
   locksRequestTimeout: 5000

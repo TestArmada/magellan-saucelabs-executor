@@ -58,7 +58,9 @@ describe("Executor", () => {
 
     it("no create tunnel", () => {
       mocks.config = {
-        useTunnels: null
+        tunnel: {
+          useTunnels: false
+        }
       };
 
       return executor
@@ -69,8 +71,10 @@ describe("Executor", () => {
 
     it("use existing tunnel", () => {
       mocks.config = {
-        useTunnels: null,
-        sauceTunnelId: "FAKE_ID",
+        tunnel: {
+          useTunnels: false,
+          tunnelIdentifier: "FAKE_ID",
+        },
         sharedSauceParentAccount: "FAKE_PARENT_ACCOUNT"
       };
 
@@ -82,7 +86,9 @@ describe("Executor", () => {
 
     it("create new tunnel", () => {
       mocks.config = {
-        useTunnels: true,
+        tunnel: {
+          useTunnels: true,
+        }
       };
 
       return executor
@@ -141,7 +147,7 @@ describe("Executor", () => {
           open() { return new Promise((resolve) => resolve()) }
         },
 
-        config: {}
+        config: { tunnel: {} }
       };
 
       return executor
@@ -191,7 +197,7 @@ describe("Executor", () => {
         open() { return new Promise((resolve) => resolve()) }
       },
 
-      config: {}
+      config: { tunnel: {} }
     };
 
     return executor
@@ -217,7 +223,7 @@ describe("Executor", () => {
         open() { return new Promise((resolve) => resolve()) }
       },
 
-      config: {}
+      config: { tunnel: {} }
     };
 
     return executor

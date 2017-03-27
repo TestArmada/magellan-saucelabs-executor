@@ -22,17 +22,16 @@ describe("Configuration", () => {
   it("getConfig", () => {
     const config = configuration.getConfig();
 
-    expect(config.username).to.equal(null);
-    expect(config.accessKey).to.equal(null);
-    expect(config.sauceConnectVersion).to.equal(null);
-    expect(config.sauceTunnelId).to.equal(null);
-    expect(config.sharedSauceParentAccount).to.equal(null);
-    expect(config.tunnelTimeout).to.equal(null);
-    expect(config.useTunnels).to.equal(null);
-    expect(config.fastFailRegexps).to.equal(null);
-    expect(config.locksServerLocation).to.equal(null);
+    expect(config.tunnel.username).to.equal(null);
+    expect(config.tunnel.accessKey).to.equal(null);
+    expect(config.tunnel.connectVersion).to.equal(null);
+    expect(config.tunnel.tunnelIdentifier).to.equal(null);
+    expect(config.tunnel.fastFailRegexps).to.equal(null);
 
-    expect(config.maxTunnels).to.equal(1);
+    expect(config.sharedSauceParentAccount).to.equal(null);
+    expect(config.useTunnels).to.equal(false);
+
+    expect(config.locksServerLocation).to.equal(null);
     expect(config.locksOutageTimeout).to.equal(1000 * 60 * 5);
     expect(config.locksPollingInterval).to.equal(5000);
     expect(config.locksRequestTimeout).to.equal(5000);
@@ -41,20 +40,19 @@ describe("Configuration", () => {
   describe("validateConfig", () => {
     it("Executor disabled", () => {
       let argvMock = {};
+      let envMock = {};
+      const config = configuration.validateConfig({}, argvMock, envMock);
 
-      const config = configuration.validateConfig({}, {}, {});
+      expect(config.tunnel.username).to.equal(null);
+      expect(config.tunnel.accessKey).to.equal(null);
+      expect(config.tunnel.connectVersion).to.equal(null);
+      expect(config.tunnel.tunnelIdentifier).to.equal(null);
+      expect(config.tunnel.fastFailRegexps).to.equal(null);
 
-      expect(config.username).to.equal(undefined);
-      expect(config.accessKey).to.equal(undefined);
-      expect(config.sauceConnectVersion).to.equal(undefined);
-      expect(config.sauceTunnelId).to.equal(undefined);
-      expect(config.sharedSauceParentAccount).to.equal(undefined);
-      expect(config.tunnelTimeout).to.equal(undefined);
+      expect(config.sharedSauceParentAccount).to.equal(null);
       expect(config.useTunnels).to.equal(false);
-      expect(config.fastFailRegexps).to.equal(undefined);
-      expect(config.locksServerLocation).to.equal(undefined);
 
-      expect(config.maxTunnels).to.equal(1);
+      expect(config.locksServerLocation).to.equal(undefined);
       expect(config.locksOutageTimeout).to.equal(1000 * 60 * 5);
       expect(config.locksPollingInterval).to.equal(5000);
       expect(config.locksRequestTimeout).to.equal(5000);
@@ -83,17 +81,16 @@ describe("Configuration", () => {
 
         const config = configuration.validateConfig({}, argvMock, envMock);
 
-        expect(config.username).to.equal("FAKE_USERNAME");
-        expect(config.accessKey).to.equal("FAKE_ACCESSKEY");
-        expect(config.sauceConnectVersion).to.equal("FAKE_VERSION");
-        expect(config.sauceTunnelId).to.be.a("string");
-        expect(config.sharedSauceParentAccount).to.equal(undefined);
-        expect(config.tunnelTimeout).to.equal(400);
-        expect(config.useTunnels).to.equal(true);
-        expect(config.fastFailRegexps).to.equal("a,b,c");
-        expect(config.locksServerLocation).to.equal("FAKE_LOCKSERVER");
+        expect(config.tunnel.username).to.equal("FAKE_USERNAME");
+        expect(config.tunnel.accessKey).to.equal("FAKE_ACCESSKEY");
+        expect(config.tunnel.connectVersion).to.equal("FAKE_VERSION");
+        expect(config.tunnel.tunnelIdentifier).to.be.a("string");
+        expect(config.tunnel.fastFailRegexps).to.equal("a,b,c");
 
-        expect(config.maxTunnels).to.equal(1);
+        expect(config.sharedSauceParentAccount).to.equal(null);
+        expect(config.useTunnels).to.equal(true);
+
+        expect(config.locksServerLocation).to.equal("FAKE_LOCKSERVER");
         expect(config.locksOutageTimeout).to.equal(1000 * 60 * 5);
         expect(config.locksPollingInterval).to.equal(5000);
         expect(config.locksRequestTimeout).to.equal(5000);
@@ -116,17 +113,16 @@ describe("Configuration", () => {
 
         const config = configuration.validateConfig({ isEnabled: true }, argvMock, envMock);
 
-        expect(config.username).to.equal("FAKE_USERNAME");
-        expect(config.accessKey).to.equal("FAKE_ACCESSKEY");
-        expect(config.sauceConnectVersion).to.equal("FAKE_VERSION");
-        expect(config.sauceTunnelId).to.be.a("string");
-        expect(config.sharedSauceParentAccount).to.equal(undefined);
-        expect(config.tunnelTimeout).to.equal(400);
-        expect(config.useTunnels).to.equal(true);
-        expect(config.fastFailRegexps).to.equal("a,b,c");
-        expect(config.locksServerLocation).to.equal("FAKE_LOCKSERVER");
+        expect(config.tunnel.username).to.equal("FAKE_USERNAME");
+        expect(config.tunnel.accessKey).to.equal("FAKE_ACCESSKEY");
+        expect(config.tunnel.connectVersion).to.equal("FAKE_VERSION");
+        expect(config.tunnel.tunnelIdentifier).to.be.a("string");
+        expect(config.tunnel.fastFailRegexps).to.equal("a,b,c");
 
-        expect(config.maxTunnels).to.equal(1);
+        expect(config.sharedSauceParentAccount).to.equal(null);
+        expect(config.useTunnels).to.equal(true);
+
+        expect(config.locksServerLocation).to.equal("FAKE_LOCKSERVER");
         expect(config.locksOutageTimeout).to.equal(1000 * 60 * 5);
         expect(config.locksPollingInterval).to.equal(5000);
         expect(config.locksRequestTimeout).to.equal(5000);
@@ -139,8 +135,11 @@ describe("Configuration", () => {
           SAUCE_CONNECT_VERSION: "FAKE_VERSION"
         };
 
+
         try {
-          configuration.validateConfig({}, argvMock, envMock);
+          configuration.validateConfig({},
+            _.assign({}, argvMock, { sauce_tunnel_config: "./test/src/tunnel.json" }),
+            envMock);
           assert(false, "tunnel config shouldn't pass verification.");
         } catch (e) {
           expect(e.message).to.equal("Missing configuration for Saucelabs connection.");
@@ -155,7 +154,9 @@ describe("Configuration", () => {
         };
 
         try {
-          configuration.validateConfig({}, argvMock, envMock);
+          configuration.validateConfig({},
+            _.assign({}, argvMock, { sauce_tunnel_config: "./test/src/tunnel.json" }),
+            envMock);
           assert(false, "tunnel config shouldn't pass verification.");
         } catch (e) {
           expect(e.message).to.equal("Missing configuration for Saucelabs connection.");
@@ -170,7 +171,9 @@ describe("Configuration", () => {
         };
 
         try {
-          configuration.validateConfig({}, argvMock, envMock);
+          configuration.validateConfig({},
+            _.assign({}, argvMock, { sauce_tunnel_config: "./test/src/tunnel.json" }),
+            envMock);
         } catch (e) {
           assert(false, "tunnel config shouldn't fail verification.");
         }
@@ -215,6 +218,22 @@ describe("Configuration", () => {
           configuration.validateConfig({}, argvMock, envMock);
         } catch (e) {
           expect(e.message).to.match(/^--shared_sauce_parent_account only works with --sauce_tunnel_id/);
+        }
+      });
+
+      it("config file doesn't exist", () => {
+        let envMock = {
+          SAUCE_USERNAME: "FAKE_USERNAME",
+          SAUCE_ACCESS_KEY: "FAKE_ACCESSKEY",
+          SAUCE_CONNECT_VERSION: "FAKE_VERSION"
+        };
+
+        try {
+          configuration.validateConfig({},
+            _.assign({}, argvMock, { sauce_tunnel_config: "./test/src/nonetunnel.json" }),
+            envMock);
+        } catch (e) {
+          expect(e.message).to.match(/^Error: Cannot find module/);
         }
       });
     });

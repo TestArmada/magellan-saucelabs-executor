@@ -53,8 +53,8 @@ export default {
         });
     } else {
       return new Promise((resolve) => {
-        if (config.sauceTunnelId) {
-          let tunnelAnnouncement = config.sauceTunnelId;
+        if (config.tunnel.tunnelIdentifier) {
+          let tunnelAnnouncement = config.tunnel.tunnelIdentifier;
           if (config.sharedSauceParentAccount) {
             tunnelAnnouncement = `${config.sharedSauceParentAccount}/${tunnelAnnouncement}`;
           }

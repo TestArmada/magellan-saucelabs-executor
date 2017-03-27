@@ -21,8 +21,8 @@ export default {
   getNightwatchConfig: (profile, sauceSettings) => {
     const capabilities = _.assign({}, profile.desiredCapabilities);
 
-    if (sauceSettings.sauceTunnelId) {
-      capabilities["tunnel-identifier"] = sauceSettings.sauceTunnelId;
+    if (sauceSettings.tunnel.tunnelIdentifier) {
+      capabilities["tunnel-identifier"] = sauceSettings.tunnel.tunnelIdentifier;
       if (sauceSettings.sharedSauceParentAccount) {
         // if tunnel is shared by parent account
         capabilities["parent-tunnel"] = sauceSettings.sharedSauceParentAccount;
@@ -35,8 +35,8 @@ export default {
     /*eslint-disable camelcase*/
     const config = {
       desiredCapabilities: capabilities,
-      username: sauceSettings.username,
-      access_key: sauceSettings.accessKey
+      username: sauceSettings.tunnel.username,
+      access_key: sauceSettings.tunnel.accessKey
     };
 
     logger.debug(`executor config: ${JSON.stringify(config)}`);
