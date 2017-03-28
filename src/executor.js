@@ -43,7 +43,7 @@ export default {
         .then(() => {
           analytics.mark("sauce-open-tunnels");
           logger.log("Sauce tunnel is opened!  Continuing...");
-          logger.log(`Assigned tunnel [${config.sauceTunnelId}] to all workers`);
+          logger.log(`Assigned tunnel [${config.tunnel.tunnelIdentifier}] to all workers`);
         })
         .catch((err) => {
           analytics.mark("sauce-open-tunnels", "failed");

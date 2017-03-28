@@ -113,7 +113,7 @@ export default class Tunnel {
   close() {
     return new Promise((resolve) => {
       if (this.tunnelInfo) {
-        logger.log(`Closing sauce tunnel [${this.options.sauceTunnelId}]`);
+        logger.log(`Closing sauce tunnel [${this.options.tunnel.tunnelIdentifier}]`);
         this.tunnelInfo.process.close(() => {
           resolve();
         });
