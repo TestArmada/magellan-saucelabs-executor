@@ -6,13 +6,13 @@ import _ from "lodash";
 import logger from "../../lib/logger";
 
 // eat console logs
-logger.output = {
-  log() { },
-  error() { },
-  debug() { },
-  warn() { },
-  loghelp() { }
-};
+// logger.output = {
+//   log() { },
+//   error() { },
+//   debug() { },
+//   warn() { },
+//   loghelp() { }
+// };
 
 chai.use(chaiAsPromise);
 

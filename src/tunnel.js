@@ -17,19 +17,19 @@ export default class Tunnel {
 
   initialize() {
     return new Promise((resolve, reject) => {
-      if (!this.options.username) {
+      if (!this.options.tunnel.username) {
         return reject("Sauce tunnel support is missing configuration: Sauce username.");
       }
 
-      if (!this.options.accessKey) {
+      if (!this.options.tunnel.accessKey) {
         return reject("Sauce tunnel support is missing configuration: Sauce access key.");
       }
 
       analytics.push("sauce-connect-launcher-download");
+
+      const options = _.assign({}, this.options.tunnel, { logger: logger.debug });
       /*eslint-disable no-console */
-      return this.sauceConnectLauncher.download({
-        logger: console.log.bind(console)
-      }, (err) => {
+      return this.sauceConnectLauncher.download(options, (err) => {
         if (err) {
           analytics.mark("sauce-connect-launcher-download", "failed");
           logger.err("Failed to download sauce connect binary:");
@@ -48,33 +48,25 @@ export default class Tunnel {
 
   open() {
     this.tunnelInfo = null;
-    const tunnelId = this.options.sauceTunnelId;
-    const username = this.options.username;
-    const accessKey = this.options.accessKey;
     let connectFailures = 0;
 
-    logger.log(`Opening sauce tunnel [${ tunnelId }] for user ${ username}`);
+    logger.log(`Opening sauce tunnel [${this.options.tunnel.tunnelIdentifier}]`
+      + ` for user ${this.options.tunnel.username}`);
 
     const connect = (/*runDiagnostics*/) => {
       return new Promise((resolve, reject) => {
-        const logFilePath = `${path.resolve(settings.tempDir) }/build-${
-           settings.buildId }_sauceconnect_${ tunnelId }.log`;
-        const sauceOptions = {
-          username,
-          accessKey,
-          tunnelIdentifier: tunnelId,
-          readyFileId: tunnelId,
+        const logFilePath = `${path.resolve(settings.tempDir)}/build-${
+          settings.buildId}_sauceconnect_${this.options.tunnel.tunnelIdentifier}.log`;
+
+        const sauceOptions = _.assign({}, this.options.tunnel, {
+          readyFileId: this.options.tunnel.tunnelIdentifier,
           verbose: settings.debug,
           verboseDebugging: settings.debug,
           logfile: logFilePath,
           port: settings.BASE_SELENIUM_PORT_OFFSET
-        };
+        });
 
-        if (this.options.fastFailRegexps) {
-          sauceOptions.fastFailRegexps = this.options.fastFailRegexpss;
-        }
-
-        logger.debug(`calling sauceConnectLauncher() w/ ${ JSON.stringify(sauceOptions)}`);
+        logger.debug(`calling sauceConnectLauncher() w/ ${JSON.stringify(sauceOptions)}`);
 
         this.sauceConnectLauncher(sauceOptions, (err, sauceConnectProcess) => {
           if (err) {
@@ -96,11 +88,11 @@ export default class Tunnel {
                 // Make sure other attempts don't try to re-state this error.
                 settings.BAILED = true;
                 return reject(new Error(`Failed to create a secure sauce tunnel after ${
-                   connectFailures } attempts.`));
+                  connectFailures} attempts.`));
               } else {
                 // Otherwise, keep retrying, and hope this is merely a blip and not an outage.
                 logger.err(`>>> Sauce Tunnel Connection Failed!  Retrying ${
-                   connectFailures } of ${ settings.MAX_CONNECT_RETRIES } attempts...`);
+                  connectFailures} of ${settings.MAX_CONNECT_RETRIES} attempts...`);
 
                 return connect()
                   .then(resolve)
@@ -121,7 +113,7 @@ export default class Tunnel {
   close() {
     return new Promise((resolve) => {
       if (this.tunnelInfo) {
-        logger.log(`Closing sauce tunnel [${ this.options.sauceTunnelId }]`);
+        logger.log(`Closing sauce tunnel [${this.options.tunnel.tunnelIdentifier}]`);
         this.tunnelInfo.process.close(() => {
           resolve();
         });

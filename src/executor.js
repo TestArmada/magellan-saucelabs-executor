@@ -43,7 +43,7 @@ export default {
         .then(() => {
           analytics.mark("sauce-open-tunnels");
           logger.log("Sauce tunnel is opened!  Continuing...");
-          logger.log(`Assigned tunnel [${config.sauceTunnelId}] to all workers`);
+          logger.log(`Assigned tunnel [${config.tunnel.tunnelIdentifier}] to all workers`);
         })
         .catch((err) => {
           analytics.mark("sauce-open-tunnels", "failed");
@@ -53,8 +53,8 @@ export default {
         });
     } else {
       return new Promise((resolve) => {
-        if (config.sauceTunnelId) {
-          let tunnelAnnouncement = config.sauceTunnelId;
+        if (config.tunnel.tunnelIdentifier) {
+          let tunnelAnnouncement = config.tunnel.tunnelIdentifier;
           if (config.sharedSauceParentAccount) {
             tunnelAnnouncement = `${config.sharedSauceParentAccount}/${tunnelAnnouncement}`;
           }

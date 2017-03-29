@@ -33,5 +33,11 @@ export default {
     "example": "testsauceaccount",
     "description": "Specify parent account name if existing shared secure tunnel is "
     + " in use (exclusive with --sauce_create_tunnels)"
+  },
+  "sauce_tunnel_config": {
+    "visible": true,
+    "type": "string",
+    "example": "tunnelConfig.json",
+    "description": "Specify a configuration file to read from to create sauce tunnel"
   }
 };
