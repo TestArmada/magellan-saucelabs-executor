@@ -73,7 +73,9 @@ describe("Executor", () => {
       mocks.config = {
         tunnel: {
           useTunnels: false,
-          tunnelIdentifier: "FAKE_ID",
+          tunnel: {
+            tunnelIdentifier: "FAKE_ID"
+          }
         },
         sharedSauceParentAccount: "FAKE_PARENT_ACCOUNT"
       };
@@ -172,7 +174,10 @@ describe("Executor", () => {
         },
 
         config: {
-          useTunnels: true
+          useTunnels: true,
+          tunnel: {
+            tunnelIdentifier: null
+          }
         }
       };
 
