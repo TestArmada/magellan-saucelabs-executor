@@ -41,7 +41,7 @@ Congratulations, you're all set.
 
 ## Customize sauce tunnel flags
 
-`testarmada-magellan-saucelabs-executor` supports customized sauce tunnel flags since `1.0.3`. You can put customized flags into a `.json` file and use `--sauce_tunnel_config` to load the file. 
+`testarmada-magellan-saucelabs-executor` supports customized sauce tunnel flags since `1.0.2`. You can put customized flags into a `.json` file and use `--sauce_tunnel_config` to load the file. 
 
 ```javascript
 tunnel config json example
