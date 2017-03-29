@@ -39,23 +39,51 @@ Please follow the steps
 
 Congratulations, you're all set. 
 
+## Customize sauce tunnel flags
+
+`testarmada-magellan-saucelabs-executor` supports customized sauce tunnel flags since `1.0.3`. You can put customized flags into a `.json` file and use `--sauce_tunnel_config` to load the file. 
+
+```javascript
+tunnel config json example
+
+{
+  "fastFailRegexps": "p.typekit.net",
+  "directDomains": "google.com",
+  "noSslBumpDomains": "google.com"
+}
+```
+
+For all supported flags please refer to [here](https://github.com/bermi/sauce-connect-launcher#advanced-usage).
+
+### Loading rules for env variables and customized flags
+
+Some parameters can be passed in from both env variables and customized flags (such as `SAUCE_USERNAME` from env variables and `username` from flags). It is very important to understand which one will take effect if set up both.
+
+ 1. env variable always has top priority.
+ 2. customized flags only work when no corresponding env variable set
+
 ## Example
 To run test in latest chrome on Windows10 without a tunnel
-```
+```console
 $ ./node_modules/.bin/magellan --sauce_browser chrome_latest_Windows_10_Desktop --test xxx
 ```
 
 To run test in latest chrome on Windows10 with a new tunnel
-```
+```console
 $ ./node_modules/.bin/magellan --sauce_browser chrome_latest_Windows_10_Desktop --sauce_create_tunnels --test xxx
 ```
 
 To run test in latest chrome on Windows10 with an exiting tunnel
-```
+```console
 $ ./node_modules/.bin/magellan --sauce_browser chrome_latest_Windows_10_Desktop --sauce_tunnel_id xxx --test xxx
 ```
 
 To run test in latest chrome, latest firefox on Windows10 and safari 9 on MacOS 10.11
-```
+```console
 $ ./node_modules/.bin/magellan --sauce_browsers chrome_latest_Windows_10_Desktop,firefox_latest_Windows_10_Desktop,safari_9_OS_X_10_11_Desktop --test xxx
+```
+
+To create sauce tunnel connection with customized flags from `./tunnel.json`
+```console
+$ ./node_modules/.bin/magellan --sauce_browsers chrome_latest_Windows_10_Desktop --sauce_create_tunnels --sauce_tunnel_config ./tunnel.json 
 ```
