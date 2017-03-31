@@ -108,7 +108,7 @@ export default {
   summerizeTest: (magellanBuildId, testResult, callback) => {
     try {
       const sessionId = testResult.metadata.sessionId;
-      const requestPath = `/rest/v1/${config.username}/jobs/${sessionId}`;
+      const requestPath = `/rest/v1/${config.tunnel.username}/jobs/${sessionId}`;
       const data = JSON.stringify({
         "passed": testResult.result,
         // TODO: remove this
@@ -124,7 +124,7 @@ export default {
         hostname: "saucelabs.com",
         path: requestPath,
         method: "PUT",
-        auth: `${config.username}:${config.accessKey}`,
+        auth: `${config.tunnel.username}:${config.tunnel.accessKey}`,
         headers: {
           "Content-Type": "application/json",
           "Content-Length": data.length
