@@ -11,7 +11,6 @@ const _patchFirefox = (capabilities) => {
     && parseInt(capabilities.version) >= FIREFOX_MARIONETTE) {
     capabilities.marionette = true;
     capabilities.javascriptEnabled = true;
-    capabilities.seleniumVersion = "3.0.1";
   }
 
   return capabilities;
