@@ -25,8 +25,14 @@ Please follow the steps
     "testarmada-magellan-saucelabs-executor"
  ]
  ```
+ 3. set env variables
+ ```
+ export SAUCE_CONNECT_VERSION=${VERSION}
+ export SAUCE_USERNAME=${USERNAME}
+ export SAUCE_ACCESS_KEY=${TOKEN}
+ ```
 
- 3. `./node_modules/.bin/magellan ----help` to see if you can see the following content printed out
+ 4. `./node_modules/.bin/magellan ----help` to see if you can see the following content printed out
  ```
   Executor-specific (testarmada-magellan-sauce-executor)
    --sauce_browser=browsername          Run tests in chrome, firefox, etc (default: phantomjs).
