@@ -1,11 +1,13 @@
 import request from "request";
 import _ from "lodash";
 import logger from "./logger";
+import http from "http";
 
 export default class Locks {
   constructor(options, requestMock = null) {
     this.options = _.assign({}, options);
     this.request = request;
+    this.agent = new http.Agent({ maxSockets: 5 });
 
     if (requestMock) {
       this.request = requestMock;
@@ -36,6 +38,7 @@ export default class Locks {
         return this.request.post({
           url: `${this.options.locksServerLocation}/claim`,
           timeout: this.options.locksRequestTimeout,
+          agent: this.agent,
           form: {}
         }, (error, response, body) => {
           try {
