@@ -2,6 +2,7 @@ import executor from "../../lib/executor";
 import chai from "chai";
 import chaiAsPromise from "chai-as-promised";
 import _ from "lodash";
+import settings from "../../lib/settings";
 
 import logger from "../../lib/logger";
 
@@ -42,8 +43,9 @@ describe("Executor", () => {
       mocks = {
         Locks: class Locks {
           constructor(config) { }
-          acquire(callback) { callabck() }
+          acquire(callback) { callback() }
           release(info, callback) { callback() }
+          teardown() { }
         },
 
         Tunnel: class Tunnel {
@@ -66,7 +68,9 @@ describe("Executor", () => {
       return executor
         .setupRunner(mocks)
         .then(() => { })
-        .catch(err => assert(false, "executor setupRunner isn't successful for no create tunnel config"));
+        .catch(err => {
+          assert(false, "executor setupRunner isn't successful for no create tunnel config");
+        });
     });
 
     it("use existing tunnel", () => {
@@ -141,6 +145,7 @@ describe("Executor", () => {
           constructor(config) { }
           acquire(callback) { callback(1) }
           release(info, callback) { callback(2) }
+          teardown() { }
         },
 
         Tunnel: class Tunnel {
@@ -164,6 +169,7 @@ describe("Executor", () => {
           constructor(config) { }
           acquire(callback) { callback(1) }
           release(info, callback) { callback(2) }
+          teardown() { }
         },
 
         Tunnel: class Tunnel {
@@ -194,6 +200,7 @@ describe("Executor", () => {
         constructor(config) { }
         acquire(callback) { callback(1) }
         release(info, callback) { callback(2) }
+        teardown() { }
       },
 
       Tunnel: class Tunnel {
@@ -219,7 +226,8 @@ describe("Executor", () => {
       Locks: class Locks {
         constructor(config) { }
         acquire(callback) { callback(1) }
-        release(info, callback) { callback(info) }
+        release(info) { }
+        teardown() { }
       },
 
       Tunnel: class Tunnel {
