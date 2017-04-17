@@ -23,7 +23,9 @@ const Executor = {
 
     return Executor
       .setupTunnels(mocks)
-      .then(locks.initialize);
+      .then(() => {
+        return locks.initialize();
+      });
   },
 
   setupTunnels: (mocks = null) => {

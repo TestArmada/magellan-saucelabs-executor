@@ -63,6 +63,8 @@ export default class LocksAPI {
 
         return null;
       });
+
+      return null;
     }
 
     return callback();
