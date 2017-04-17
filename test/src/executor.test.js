@@ -45,6 +45,7 @@ describe("Executor", () => {
           constructor(config) { }
           acquire(callback) { callback() }
           release(info, callback) { callback() }
+          initialize() { return new Promise((resolve) => resolve()) }
           teardown() { }
         },
 
@@ -145,6 +146,7 @@ describe("Executor", () => {
           constructor(config) { }
           acquire(callback) { callback(1) }
           release(info, callback) { callback(2) }
+          initialize() { return new Promise((resolve) => resolve()) }
           teardown() { }
         },
 
@@ -169,6 +171,7 @@ describe("Executor", () => {
           constructor(config) { }
           acquire(callback) { callback(1) }
           release(info, callback) { callback(2) }
+          initialize() { return new Promise((resolve) => resolve()) }
           teardown() { }
         },
 
@@ -200,6 +203,7 @@ describe("Executor", () => {
         constructor(config) { }
         acquire(callback) { callback(1) }
         release(info, callback) { callback(2) }
+        initialize() { return new Promise((resolve) => resolve()) }
         teardown() { }
       },
 
@@ -227,6 +231,7 @@ describe("Executor", () => {
         constructor(config) { }
         acquire(callback) { callback(1) }
         release(info) { }
+        initialize() { return new Promise((resolve) => resolve()) }
         teardown() { }
       },
 
