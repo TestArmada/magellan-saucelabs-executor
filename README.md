@@ -45,6 +45,16 @@ Please follow the steps
 
 Congratulations, you're all set. 
 
+## Configuring `locks` support
+
+`testarmada-magellan-saucelabs-executor` is able to communicate with a [Locks](https://github.com/TestArmada/locks) instance for Saucelabs traffic control.
+
+To configure `locks`, set the `LOCKS_SERVER` environment variable as follows:
+
+```
+export LOCKS_SERVER=http://yourlockshost:4765/
+```
+
 ## Customize sauce tunnel flags
 
 `testarmada-magellan-saucelabs-executor` supports customized sauce tunnel flags since `1.0.2`. You can put customized flags into a `.json` file and use `--sauce_tunnel_config` to load the file. 
