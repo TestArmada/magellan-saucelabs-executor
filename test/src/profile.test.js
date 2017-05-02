@@ -20,6 +20,53 @@ const expect = chai.expect;
 const assert = chai.assert;
 
 describe("Profile", () => {
+  describe("getNightwatchConfig", () => {
+    const p = {
+      desiredCapabilities: {
+        browser: "chrome"
+      }
+    };
+
+    const ss = {
+      tunnel: {
+        tunnelIdentifier: "FAKE_TUNNEL_ID",
+        username: "FAME_USERNAME",
+        accessKey: "FAKE_KEY"
+      }
+    };
+
+    it("only with tunnel id", () => {
+      const config = profile.getNightwatchConfig(p, ss);
+      expect(config.desiredCapabilities.browser).to.equal("chrome");
+      expect(config.desiredCapabilities["tunnel-identifier"]).to.equal("FAKE_TUNNEL_ID");
+      expect(config.desiredCapabilities["parent-tunnel"]).to.equal(undefined);
+      expect(config.username).to.equal("FAME_USERNAME");
+      expect(config.access_key).to.equal("FAKE_KEY");
+    });
+
+    it("with parent tunnel id", () => {
+      ss.sharedSauceParentAccount = "FAKE_SHARED";
+
+      const config = profile.getNightwatchConfig(p, ss);
+      expect(config.desiredCapabilities.browser).to.equal("chrome");
+      expect(config.desiredCapabilities["tunnel-identifier"]).to.equal("FAKE_TUNNEL_ID");
+      expect(config.desiredCapabilities["parent-tunnel"]).to.equal("FAKE_SHARED");
+      expect(config.username).to.equal("FAME_USERNAME");
+      expect(config.access_key).to.equal("FAKE_KEY");
+    });
+
+    it("no tunnel id", () => {
+      ss.tunnel.tunnelIdentifier = null;
+
+      const config = profile.getNightwatchConfig(p, ss);
+      expect(config.desiredCapabilities.browser).to.equal("chrome");
+      expect(config.desiredCapabilities["tunnel-identifier"]).to.equal(undefined);
+      expect(config.desiredCapabilities["parent-tunnel"]).to.equal(undefined);
+      expect(config.username).to.equal("FAME_USERNAME");
+      expect(config.access_key).to.equal("FAKE_KEY");
+    });
+  });
+
   describe("getProfiles", () => {
     it("with sauce_browser", () => {
       let argvMock = {
