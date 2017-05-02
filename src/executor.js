@@ -106,8 +106,22 @@ export default {
 
   /*eslint-disable consistent-return*/
   summerizeTest: (magellanBuildId, testResult, callback) => {
+    let additionalLog = "";
+
+    if (!testResult.metadata) {
+      // testarmada-nightwatch-extra isn't in use, users need
+      // to report result to saucelabs by themselves
+      logger.warn("No meta data is found, executor will not report result to saucelabs");
+      return callback();
+    }
     try {
       const sessionId = testResult.metadata.sessionId;
+
+      if (!testResult.result) {
+        // print out sauce replay to console if test failed
+        additionalLog = logger.stringifyWarn(`Saucelabs replay can be found at https://saucelabs.com/tests/${sessionId}\n`);
+      }
+
       const requestPath = `/rest/v1/${config.tunnel.username}/jobs/${sessionId}`;
       const data = JSON.stringify({
         "passed": testResult.result,
@@ -137,7 +151,7 @@ export default {
           logger.debug(`BODY: ${chunk}`);
         });
         res.on("end", () => {
-          return callback();
+          return callback(additionalLog);
         });
       });
 
@@ -147,7 +161,7 @@ export default {
       req.write(data);
       req.end();
     } catch (err) {
-      logger.err(`Error${err}`);
+      logger.err(`Error ${err}`);
       return callback();
     }
   }
