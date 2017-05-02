@@ -30,5 +30,17 @@ export default {
   },
   loghelp(msg) {
     this.output.log(msg);
+  },
+  stringifyLog(msg) {
+    const info = clc.greenBright("[INFO]");
+    return util.format("%s [%s] %s", info, PREFIX, msg);
+  },
+  stringifyWarn(msg) {
+    const warn = clc.yellowBright("[WARN]");
+    return util.format("%s [%s] %s", warn, PREFIX, msg);
+  },
+  stringifyErr(msg) {
+    const err = clc.redBright("[ERROR]");
+    return util.format("%s [%s] %s", err, PREFIX, msg);
   }
 };
