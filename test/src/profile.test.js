@@ -4,6 +4,7 @@ import chaiAsPromise from "chai-as-promised";
 import _ from "lodash";
 
 import logger from "../../lib/logger";
+import settings from "../../lib/settings";
 
 // eat console logs
 // logger.output = {
@@ -18,6 +19,8 @@ chai.use(chaiAsPromise);
 
 const expect = chai.expect;
 const assert = chai.assert;
+
+const originalProxy = settings.proxy;
 
 describe("Profile", () => {
   describe("getNightwatchConfig", () => {
@@ -130,6 +133,10 @@ describe("Profile", () => {
   });
 
   describe("getCapabilities", () => {
+    afterEach(() => {
+      settings.proxy = originalProxy;
+    });
+
     it("desktop web", () => {
       let p = {
         "browser": "microsoftedge_14_Windows_10_Desktop",
@@ -167,6 +174,24 @@ describe("Profile", () => {
           expect(result.executor).to.equal("sauce");
           expect(result.nightwatchEnv).to.equal("sauce");
           expect(result.id).to.equal("iphone_9_2_iOS_iPhone_Simulator");
+        });
+    });
+
+    it("uses a proxy", () => {
+      settings.proxy = {
+        httpProxy: "FAKE_PROXY"
+      };
+
+      let p = {
+        "browser": "microsoftedge_14_Windows_10_Desktop",
+        "resolution": "1280x1024",
+        "executor": "sauce"
+      };
+
+      return profile
+        .getCapabilities(p)
+        .then((result) => {
+          expect(result.desiredCapabilities.proxy.httpProxy).to.equal("FAKE_PROXY");
         });
     });
   });
