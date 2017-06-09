@@ -61,6 +61,13 @@ export default {
       settings.config.tunnel.tunnelIdentifier = runArgv.sauce_tunnel_id;
     }
 
+    // optional outbound HTTP Sauce-specific proxy configuration
+    if (env.SELENIUM_HTTP_PROXY) {
+      settings.config.proxy = {
+        httpProxy: env.SELENIUM_HTTP_PROXY
+      };
+    }
+
     if (env.SAUCE_TUNNEL_FAST_FAIL_REGEXPS
       && !settings.config.tunnel.fastFailRegexps) {
       // only if fastFailRegexps isn't set anywhere

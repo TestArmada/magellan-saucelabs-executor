@@ -31,6 +31,10 @@ export default {
       delete capabilities["tunnel-identifier"];
     }
 
+    if (sauceSettings.proxy) {
+      capabilities.proxy = sauceSettings.proxy;
+    }
+
     /*eslint-disable camelcase*/
     const config = {
       desiredCapabilities: capabilities,

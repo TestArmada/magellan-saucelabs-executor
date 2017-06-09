@@ -16,6 +16,9 @@ const config = {
     tunnelIdentifier: null,
     fastFailRegexps: null
   },
+
+  proxy: null,
+
   sharedSauceParentAccount: null,
   useTunnels: false,
 
