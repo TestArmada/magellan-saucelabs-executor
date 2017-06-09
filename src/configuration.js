@@ -64,7 +64,8 @@ export default {
     // optional outbound HTTP Sauce-specific proxy configuration
     if (env.SAUCE_OUTBOUND_PROXY) {
       settings.config.proxy = {
-        httpProxy: env.SAUCE_OUTBOUND_PROXY
+        httpProxy: env.SAUCE_OUTBOUND_PROXY,
+        proxyType: "manual"
       };
     }
 
