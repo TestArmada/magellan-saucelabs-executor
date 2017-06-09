@@ -62,9 +62,9 @@ export default {
     }
 
     // optional outbound HTTP Sauce-specific proxy configuration
-    if (env.SELENIUM_HTTP_PROXY) {
+    if (env.SAUCE_OUTBOUND_PROXY) {
       settings.config.proxy = {
-        httpProxy: env.SELENIUM_HTTP_PROXY
+        httpProxy: env.SAUCE_OUTBOUND_PROXY
       };
     }
 
