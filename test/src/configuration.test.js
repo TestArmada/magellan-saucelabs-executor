@@ -49,6 +49,8 @@ describe("Configuration", () => {
       expect(config.tunnel.tunnelIdentifier).to.equal(null);
       expect(config.tunnel.fastFailRegexps).to.equal(null);
 
+      expect(config.proxy).to.equal(null);
+
       expect(config.sharedSauceParentAccount).to.equal(null);
       expect(config.useTunnels).to.equal(false);
 
@@ -75,6 +77,7 @@ describe("Configuration", () => {
           SAUCE_ACCESS_KEY: "FAKE_ACCESSKEY",
           SAUCE_CONNECT_VERSION: "FAKE_VERSION",
           LOCKS_SERVER: "FAKE_LOCKSERVER/",
+          SAUCE_OUTBOUND_PROXY: "FAKE_PROXY",
           SAUCE_TUNNEL_CLOSE_TIMEOUT: 400,
           SAUCE_TUNNEL_FAST_FAIL_REGEXPS: "a,b,c"
         };
@@ -86,6 +89,8 @@ describe("Configuration", () => {
         expect(config.tunnel.connectVersion).to.equal("FAKE_VERSION");
         expect(config.tunnel.tunnelIdentifier).to.be.a("string");
         expect(config.tunnel.fastFailRegexps).to.equal("a,b,c");
+
+        expect(config.proxy.httpProxy).to.equal("FAKE_PROXY");
 
         expect(config.sharedSauceParentAccount).to.equal(null);
         expect(config.useTunnels).to.equal(true);

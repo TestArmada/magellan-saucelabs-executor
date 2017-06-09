@@ -32,6 +32,10 @@ describe("Profile", () => {
         tunnelIdentifier: "FAKE_TUNNEL_ID",
         username: "FAME_USERNAME",
         accessKey: "FAKE_KEY"
+      },
+
+      proxy: {
+        httpProxy: "FAKE_PROXY"
       }
     };
 
@@ -64,6 +68,11 @@ describe("Profile", () => {
       expect(config.desiredCapabilities["parent-tunnel"]).to.equal(undefined);
       expect(config.username).to.equal("FAME_USERNAME");
       expect(config.access_key).to.equal("FAKE_KEY");
+    });
+
+    it("sets proxy configuration", () => {
+      const config = profile.getNightwatchConfig(p, ss);
+      expect(config.desiredCapabilities.proxy.httpProxy).to.equal("FAKE_PROXY");
     });
   });
 
