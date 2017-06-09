@@ -77,7 +77,7 @@ describe("Profile", () => {
         .getProfiles({}, argvMock)
         .then((profile) => {
           expect(profile.desiredCapabilities.browserName).to.equal("chrome");
-          expect(profile.desiredCapabilities.version).to.equal("57");
+          expect(profile.desiredCapabilities.version).to.equal("58");
           expect(profile.desiredCapabilities.platform).to.equal("Windows 10");
           expect(profile.executor).to.equal("sauce");
           expect(profile.nightwatchEnv).to.equal("sauce");
@@ -95,7 +95,7 @@ describe("Profile", () => {
         .then((profiles) => {
           expect(profiles.length).to.equal(2);
           expect(profiles[0].desiredCapabilities.browserName).to.equal("chrome");
-          expect(profiles[0].desiredCapabilities.version).to.equal("57");
+          expect(profiles[0].desiredCapabilities.version).to.equal("58");
           expect(profiles[0].desiredCapabilities.platform).to.equal("Windows 10");
           expect(profiles[0].executor).to.equal("sauce");
           expect(profiles[0].nightwatchEnv).to.equal("sauce");
