@@ -3,6 +3,7 @@ import SauceBrowsers from "guacamole";
 import listSauceCliBrowsers from "guacamole/src/cli_list";
 import { argv } from "yargs";
 import logger from "./logger";
+import settings from "./settings";
 
 const FIREFOX_MARIONETTE = 48;
 
@@ -29,6 +30,10 @@ export default {
     } else {
       // This property may exist, so blow it away
       delete capabilities["tunnel-identifier"];
+    }
+
+    if (sauceSettings.proxy) {
+      capabilities.proxy = sauceSettings.proxy;
     }
 
     /*eslint-disable camelcase*/
@@ -119,6 +124,11 @@ export default {
         return new Promise((resolve, reject) => {
           try {
             const desiredCapabilities = _patchFirefox(SauceBrowsers.get(prof)[0]);
+
+            if (settings.proxy) {
+              desiredCapabilities.proxy = settings.proxy;
+            }
+
             // add executor info back to capabilities
             const p = {
               desiredCapabilities,

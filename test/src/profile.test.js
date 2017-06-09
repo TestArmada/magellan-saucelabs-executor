@@ -4,6 +4,7 @@ import chaiAsPromise from "chai-as-promised";
 import _ from "lodash";
 
 import logger from "../../lib/logger";
+import settings from "../../lib/settings";
 
 // eat console logs
 // logger.output = {
@@ -19,6 +20,8 @@ chai.use(chaiAsPromise);
 const expect = chai.expect;
 const assert = chai.assert;
 
+const originalProxy = settings.proxy;
+
 describe("Profile", () => {
   describe("getNightwatchConfig", () => {
     const p = {
@@ -32,6 +35,10 @@ describe("Profile", () => {
         tunnelIdentifier: "FAKE_TUNNEL_ID",
         username: "FAME_USERNAME",
         accessKey: "FAKE_KEY"
+      },
+
+      proxy: {
+        httpProxy: "FAKE_PROXY"
       }
     };
 
@@ -65,6 +72,11 @@ describe("Profile", () => {
       expect(config.username).to.equal("FAME_USERNAME");
       expect(config.access_key).to.equal("FAKE_KEY");
     });
+
+    it("sets proxy configuration", () => {
+      const config = profile.getNightwatchConfig(p, ss);
+      expect(config.desiredCapabilities.proxy.httpProxy).to.equal("FAKE_PROXY");
+    });
   });
 
   describe("getProfiles", () => {
@@ -77,7 +89,7 @@ describe("Profile", () => {
         .getProfiles({}, argvMock)
         .then((profile) => {
           expect(profile.desiredCapabilities.browserName).to.equal("chrome");
-          expect(profile.desiredCapabilities.version).to.equal("57");
+          expect(profile.desiredCapabilities.version).to.equal("58");
           expect(profile.desiredCapabilities.platform).to.equal("Windows 10");
           expect(profile.executor).to.equal("sauce");
           expect(profile.nightwatchEnv).to.equal("sauce");
@@ -95,7 +107,7 @@ describe("Profile", () => {
         .then((profiles) => {
           expect(profiles.length).to.equal(2);
           expect(profiles[0].desiredCapabilities.browserName).to.equal("chrome");
-          expect(profiles[0].desiredCapabilities.version).to.equal("57");
+          expect(profiles[0].desiredCapabilities.version).to.equal("58");
           expect(profiles[0].desiredCapabilities.platform).to.equal("Windows 10");
           expect(profiles[0].executor).to.equal("sauce");
           expect(profiles[0].nightwatchEnv).to.equal("sauce");
@@ -121,6 +133,10 @@ describe("Profile", () => {
   });
 
   describe("getCapabilities", () => {
+    afterEach(() => {
+      settings.proxy = originalProxy;
+    });
+
     it("desktop web", () => {
       let p = {
         "browser": "microsoftedge_14_Windows_10_Desktop",
@@ -158,6 +174,24 @@ describe("Profile", () => {
           expect(result.executor).to.equal("sauce");
           expect(result.nightwatchEnv).to.equal("sauce");
           expect(result.id).to.equal("iphone_9_2_iOS_iPhone_Simulator");
+        });
+    });
+
+    it("uses a proxy", () => {
+      settings.proxy = {
+        httpProxy: "FAKE_PROXY"
+      };
+
+      let p = {
+        "browser": "microsoftedge_14_Windows_10_Desktop",
+        "resolution": "1280x1024",
+        "executor": "sauce"
+      };
+
+      return profile
+        .getCapabilities(p)
+        .then((result) => {
+          expect(result.desiredCapabilities.proxy.httpProxy).to.equal("FAKE_PROXY");
         });
     });
   });
