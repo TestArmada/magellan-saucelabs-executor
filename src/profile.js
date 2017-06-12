@@ -42,8 +42,8 @@ export default {
     // property directly on the environment configuration object (note: this is
     // NOT to be confused with proxy settings in desiredCapabilities, which are
     // used for return path traffic from the remote browser).
-    if (sauceSettings.seleniumOutboundProxy) {
-      config.proxy = sauceSettings.seleniumOutboundProxy;
+    if (sauceSettings.sauceOutboundProxy) {
+      config.proxy = sauceSettings.sauceOutboundProxy;
     }
 
     logger.debug(`executor config: ${JSON.stringify(config)}`);

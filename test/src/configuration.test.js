@@ -90,7 +90,7 @@ describe("Configuration", () => {
 
         expect(config.sharedSauceParentAccount).to.equal(null);
         expect(config.useTunnels).to.equal(true);
-        expect(config.seleniumOutboundProxy).to.equal("FAKE_PROXY");
+        expect(config.sauceOutboundProxy).to.equal("FAKE_PROXY");
 
         expect(config.locksServerLocation).to.equal("FAKE_LOCKSERVER");
         expect(config.locksOutageTimeout).to.equal(1000 * 60 * 5);

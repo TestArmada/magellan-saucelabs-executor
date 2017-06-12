@@ -72,7 +72,7 @@ describe("Profile", () => {
     });
 
     it("set proxy configuration", () => {
-      ss.seleniumOutboundProxy = "FAKE_PROXY";
+      ss.sauceOutboundProxy = "FAKE_PROXY";
       const config = profile.getNightwatchConfig(p, ss);
       expect(config.proxy).to.equal("FAKE_PROXY");
     });
