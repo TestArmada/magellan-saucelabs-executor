@@ -111,11 +111,14 @@ export default {
     if (!testResult.metadata) {
       // testarmada-nightwatch-extra isn't in use, users need
       // to report result to saucelabs by themselves
-      logger.warn("No meta data is found, executor will not report result to saucelabs");
+      logger.warn("No meta data is found, executor will not report result to saucelabs"
+        + " This is mainly caused by not using https://github.com/TestArmada/nightwatch-extra");
       return callback();
     }
     try {
       const sessionId = testResult.metadata.sessionId;
+
+      logger.debug(`Saucelabs replay can be found at https://saucelabs.com/tests/${sessionId}\n`);
 
       if (!testResult.result) {
         // print out sauce replay to console if test failed
