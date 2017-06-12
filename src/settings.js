@@ -19,6 +19,8 @@ const config = {
   sharedSauceParentAccount: null,
   useTunnels: false,
 
+  seleniumOutboundProxy: null,
+
   locksServerLocation: null,
   locksOutageTimeout: 1000 * 60 * 5,
   locksPollingInterval: 5000,
