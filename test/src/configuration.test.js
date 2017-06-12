@@ -76,7 +76,8 @@ describe("Configuration", () => {
           SAUCE_CONNECT_VERSION: "FAKE_VERSION",
           LOCKS_SERVER: "FAKE_LOCKSERVER/",
           SAUCE_TUNNEL_CLOSE_TIMEOUT: 400,
-          SAUCE_TUNNEL_FAST_FAIL_REGEXPS: "a,b,c"
+          SAUCE_TUNNEL_FAST_FAIL_REGEXPS: "a,b,c",
+          SAUCE_OUTBOUND_PROXY: "FAKE_PROXY"
         };
 
         const config = configuration.validateConfig({}, argvMock, envMock);
@@ -89,6 +90,7 @@ describe("Configuration", () => {
 
         expect(config.sharedSauceParentAccount).to.equal(null);
         expect(config.useTunnels).to.equal(true);
+        expect(config.seleniumOutboundProxy).to.equal("FAKE_PROXY");
 
         expect(config.locksServerLocation).to.equal("FAKE_LOCKSERVER");
         expect(config.locksOutageTimeout).to.equal(1000 * 60 * 5);
