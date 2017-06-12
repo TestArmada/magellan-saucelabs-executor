@@ -21,19 +21,24 @@ const assert = chai.assert;
 
 describe("Profile", () => {
   describe("getNightwatchConfig", () => {
-    const p = {
-      desiredCapabilities: {
-        browser: "chrome"
-      }
-    };
+    let p = {};
+    let ss = {};
 
-    const ss = {
-      tunnel: {
-        tunnelIdentifier: "FAKE_TUNNEL_ID",
-        username: "FAME_USERNAME",
-        accessKey: "FAKE_KEY"
-      }
-    };
+    beforeEach(() => {
+      p = {
+        desiredCapabilities: {
+          browser: "chrome"
+        }
+      };
+
+      ss = {
+        tunnel: {
+          tunnelIdentifier: "FAKE_TUNNEL_ID",
+          username: "FAME_USERNAME",
+          accessKey: "FAKE_KEY"
+        }
+      };
+    });
 
     it("only with tunnel id", () => {
       const config = profile.getNightwatchConfig(p, ss);
@@ -65,6 +70,13 @@ describe("Profile", () => {
       expect(config.username).to.equal("FAME_USERNAME");
       expect(config.access_key).to.equal("FAKE_KEY");
     });
+
+    it("set proxy configuration", () => {
+      ss.sauceOutboundProxy = "FAKE_PROXY";
+      const config = profile.getNightwatchConfig(p, ss);
+      expect(config.proxy).to.equal("FAKE_PROXY");
+    });
+
   });
 
   describe("getProfiles", () => {
@@ -77,7 +89,7 @@ describe("Profile", () => {
         .getProfiles({}, argvMock)
         .then((profile) => {
           expect(profile.desiredCapabilities.browserName).to.equal("chrome");
-          expect(profile.desiredCapabilities.version).to.equal("57");
+          expect(profile.desiredCapabilities.version).to.equal("58");
           expect(profile.desiredCapabilities.platform).to.equal("Windows 10");
           expect(profile.executor).to.equal("sauce");
           expect(profile.nightwatchEnv).to.equal("sauce");
@@ -95,7 +107,7 @@ describe("Profile", () => {
         .then((profiles) => {
           expect(profiles.length).to.equal(2);
           expect(profiles[0].desiredCapabilities.browserName).to.equal("chrome");
-          expect(profiles[0].desiredCapabilities.version).to.equal("57");
+          expect(profiles[0].desiredCapabilities.version).to.equal("58");
           expect(profiles[0].desiredCapabilities.platform).to.equal("Windows 10");
           expect(profiles[0].executor).to.equal("sauce");
           expect(profiles[0].nightwatchEnv).to.equal("sauce");

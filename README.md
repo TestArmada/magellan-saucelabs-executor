@@ -45,6 +45,14 @@ Please follow the steps
 
 Congratulations, you're all set. 
 
+### Proxy Configuration
+
+To use a proxy to reach Saucelabs when querying the Saucelabs API, set an environment variable called `SAUCE_OUTBOUND_PROXY` before running Magellan with this executor:
+
+```console
+$ export SAUCE_OUTBOUND_PROXY=http://your-internal-proxy-host:8080
+```
+
 ## Customize sauce tunnel flags
 
 `testarmada-magellan-saucelabs-executor` supports customized sauce tunnel flags since `1.0.2`. You can put customized flags into a `.json` file and use `--sauce_tunnel_config` to load the file. 
