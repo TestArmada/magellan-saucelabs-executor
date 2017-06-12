@@ -47,6 +47,8 @@ Congratulations, you're all set.
 
 ### Proxy Configuration
 
+**NOTE:** At this time, proxy configuration for outbound control messages to Saucelabs is only supported for Nightwatch.js consumers. Please consider a filing pull request if you are familiar with how other frameworks configure outbound proxy access!
+
 To use a proxy to reach Saucelabs when querying the Saucelabs API, set an environment variable called `SAUCE_OUTBOUND_PROXY` before running Magellan with this executor:
 
 ```console
