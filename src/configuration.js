@@ -61,6 +61,13 @@ export default {
       settings.config.tunnel.tunnelIdentifier = runArgv.sauce_tunnel_id;
     }
 
+    // optional: *Outbound* HTTP Sauce-specific proxy configuration. Note
+    // that this is for Selenium outbound control traffic only, not the
+    // return path, and not to be confused with sauceconnect.
+    if (env.SAUCE_OUTBOUND_PROXY) {
+      settings.config.seleniumOutboundProxy = env.SAUCE_OUTBOUND_PROXY;
+    }
+
     if (env.SAUCE_TUNNEL_FAST_FAIL_REGEXPS
       && !settings.config.tunnel.fastFailRegexps) {
       // only if fastFailRegexps isn't set anywhere
