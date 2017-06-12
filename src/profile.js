@@ -38,6 +38,14 @@ export default {
       access_key: sauceSettings.tunnel.accessKey
     };
 
+    // For *outbound Selenium control traffic*, Nightwatch supports a proxy
+    // property directly on the environment configuration object (note: this is
+    // NOT to be confused with proxy settings in desiredCapabilities, which are
+    // used for return path traffic from the remote browser).
+    if (sauceSettings.sauceOutboundProxy) {
+      config.proxy = sauceSettings.sauceOutboundProxy;
+    }
+
     logger.debug(`executor config: ${JSON.stringify(config)}`);
     return config;
   },

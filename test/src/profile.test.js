@@ -21,19 +21,24 @@ const assert = chai.assert;
 
 describe("Profile", () => {
   describe("getNightwatchConfig", () => {
-    const p = {
-      desiredCapabilities: {
-        browser: "chrome"
-      }
-    };
+    let p = {};
+    let ss = {};
 
-    const ss = {
-      tunnel: {
-        tunnelIdentifier: "FAKE_TUNNEL_ID",
-        username: "FAME_USERNAME",
-        accessKey: "FAKE_KEY"
-      }
-    };
+    beforeEach(() => {
+      p = {
+        desiredCapabilities: {
+          browser: "chrome"
+        }
+      };
+
+      ss = {
+        tunnel: {
+          tunnelIdentifier: "FAKE_TUNNEL_ID",
+          username: "FAME_USERNAME",
+          accessKey: "FAKE_KEY"
+        }
+      };
+    });
 
     it("only with tunnel id", () => {
       const config = profile.getNightwatchConfig(p, ss);
@@ -65,6 +70,13 @@ describe("Profile", () => {
       expect(config.username).to.equal("FAME_USERNAME");
       expect(config.access_key).to.equal("FAKE_KEY");
     });
+
+    it("set proxy configuration", () => {
+      ss.sauceOutboundProxy = "FAKE_PROXY";
+      const config = profile.getNightwatchConfig(p, ss);
+      expect(config.proxy).to.equal("FAKE_PROXY");
+    });
+
   });
 
   describe("getProfiles", () => {
