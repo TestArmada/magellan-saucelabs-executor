@@ -14,12 +14,6 @@ let locks = null;
 export default {
   setupRunner: (mocks = null) => {
 
-    if (settings.sauceOutboundProxy) {
-      request.defaults({
-        "proxy": settings.sauceOutboundProxy
-      });
-    }
-
     let ILocks = Locks;
     let ITunnel = Tunnel;
 
@@ -144,7 +138,7 @@ export default {
       logger.debug(JSON.stringify(data));
       logger.debug(`Updating saucelabs ${requestPath}`);
 
-      request({
+      let requestOptions = {
         url: `https://saucelabs.com${requestPath}`,
         method: "PUT",
         auth: {
@@ -153,7 +147,14 @@ export default {
         },
         body: data,
         json: true
-      }, (error, res, json) => {
+      };
+
+      if (settings.config.sauceOutboundProxy) {
+        requestOptions.proxy = settings.config.sauceOutboundProxy;
+        requestOptions.strictSSL = false;
+      }
+
+      request(requestOptions, (error, res, json) => {
         if (error) {
           logger.err("Error when posting update to Saucelabs session with request:");
           logger.err(error);
