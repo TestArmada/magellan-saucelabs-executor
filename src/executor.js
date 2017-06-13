@@ -138,7 +138,7 @@ export default {
       logger.debug(JSON.stringify(data));
       logger.debug(`Updating saucelabs ${requestPath}`);
 
-      let requestOptions = {
+      const requestOptions = {
         url: `https://saucelabs.com${requestPath}`,
         method: "PUT",
         auth: {
