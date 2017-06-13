@@ -1,10 +1,10 @@
 import { fork } from "child_process";
-import https from "https";
 import Locks from "./locks";
 import Tunnel from "./tunnel";
 import logger from "./logger";
 import settings from "./settings";
 import analytics from "./global_analytics";
+import request from "request";
 
 let config = settings.config;
 
@@ -13,6 +13,13 @@ let locks = null;
 
 export default {
   setupRunner: (mocks = null) => {
+
+    if (settings.sauceOutboundProxy) {
+      request.defaults({
+        "proxy": settings.sauceOutboundProxy
+      });
+    }
+
     let ILocks = Locks;
     let ITunnel = Tunnel;
 
@@ -126,43 +133,38 @@ export default {
       }
 
       const requestPath = `/rest/v1/${config.tunnel.username}/jobs/${sessionId}`;
-      const data = JSON.stringify({
+      const data = {
         "passed": testResult.result,
         // TODO: remove this
         "build": magellanBuildId,
         "public": "team"
-      });
+      };
 
       logger.debug("Data posting to SauceLabs job:");
       logger.debug(JSON.stringify(data));
       logger.debug(`Updating saucelabs ${requestPath}`);
 
-      const req = https.request({
-        hostname: "saucelabs.com",
-        path: requestPath,
+      request({
+        url: `https://saucelabs.com${requestPath}`,
         method: "PUT",
-        auth: `${config.tunnel.username}:${config.tunnel.accessKey}`,
-        headers: {
-          "Content-Type": "application/json",
-          "Content-Length": data.length
+        auth: {
+          user: config.tunnel.username,
+          pass: config.tunnel.accessKey
+        },
+        body: data,
+        json: true
+      }, (error, res, json) => {
+        if (error) {
+          logger.err("Error when posting update to Saucelabs session with request:");
+          logger.err(error);
+          return callback();
         }
-      }, (res) => {
-        res.setEncoding("utf8");
-        logger.debug(`Response: ${res.statusCode}${JSON.stringify(res.headers)}`);
 
-        res.on("data", (chunk) => {
-          logger.debug(`BODY: ${chunk}`);
-        });
-        res.on("end", () => {
-          return callback(additionalLog);
-        });
+        logger.debug("Response from Saucelabs session update:");
+        logger.debug(JSON.stringify(json));
+        return callback(additionalLog);
       });
 
-      req.on("error", (e) => {
-        logger.err(`problem with request: ${e.message}`);
-      });
-      req.write(data);
-      req.end();
     } catch (err) {
       logger.err(`Error ${err}`);
       return callback();
