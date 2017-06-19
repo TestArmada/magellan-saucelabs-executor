@@ -32,7 +32,7 @@ Please follow the steps
  export SAUCE_ACCESS_KEY=${TOKEN}
  ```
 
- 4. `./node_modules/.bin/magellan ----help` to see if you can see the following content printed out
+ 4. `./node_modules/.bin/magellan --help` to see if you can see the following content printed out
  ```
   Executor-specific (testarmada-magellan-sauce-executor)
    --sauce_browser=browsername          Run tests in chrome, firefox, etc (default: phantomjs).
@@ -45,6 +45,7 @@ Please follow the steps
 
 Congratulations, you're all set. 
 
+
 ## Configuring `locks` support
 
 `testarmada-magellan-saucelabs-executor` is able to communicate with a [Locks](https://github.com/TestArmada/locks) instance for Saucelabs traffic control.
@@ -53,6 +54,15 @@ To configure `locks`, set the `LOCKS_SERVER` environment variable as follows:
 
 ```
 export LOCKS_SERVER=http://yourlockshost:4765/
+
+### Proxy Configuration
+
+**NOTE:** At this time, proxy configuration for outbound control messages to Saucelabs is only supported for Nightwatch.js consumers. Please consider a filing pull request if you are familiar with how other frameworks configure outbound proxy access!
+
+To use a proxy to reach Saucelabs when querying the Saucelabs API, set an environment variable called `SAUCE_OUTBOUND_PROXY` before running Magellan with this executor:
+
+```console
+$ export SAUCE_OUTBOUND_PROXY=http://your-internal-proxy-host:8080
 ```
 
 ## Customize sauce tunnel flags

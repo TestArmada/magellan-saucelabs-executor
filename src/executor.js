@@ -1,10 +1,10 @@
 import { fork } from "child_process";
-import https from "https";
 import Locks from "./locks";
 import Tunnel from "./tunnel";
 import logger from "./logger";
 import settings from "./settings";
 import analytics from "./global_analytics";
+import request from "request";
 
 let config = settings.config;
 
@@ -13,6 +13,7 @@ let locks = null;
 
 const Executor = {
   setupRunner: (mocks = null) => {
+
     let ILocks = Locks;
 
     if (mocks && mocks.Locks) {
@@ -120,48 +121,67 @@ const Executor = {
 
   /*eslint-disable consistent-return*/
   summerizeTest: (magellanBuildId, testResult, callback) => {
+    let additionalLog = "";
+
+    if (!testResult.metadata) {
+      // testarmada-nightwatch-extra isn't in use, users need
+      // to report result to saucelabs by themselves
+      logger.warn("No meta data is found, executor will not report result to saucelabs"
+        + " This is mainly caused by not using https://github.com/TestArmada/nightwatch-extra");
+      return callback();
+    }
     try {
       const sessionId = testResult.metadata.sessionId;
+
+      logger.debug(`Saucelabs replay can be found at https://saucelabs.com/tests/${sessionId}\n`);
+
+      if (!testResult.result) {
+        // print out sauce replay to console if test failed
+        additionalLog = logger.stringifyWarn(`Saucelabs replay can be found at https://saucelabs.com/tests/${sessionId}\n`);
+      }
+
       const requestPath = `/rest/v1/${config.tunnel.username}/jobs/${sessionId}`;
-      const data = JSON.stringify({
+      const data = {
         "passed": testResult.result,
         // TODO: remove this
         "build": magellanBuildId,
         "public": "team"
-      });
+      };
 
       logger.debug("Data posting to SauceLabs job:");
       logger.debug(JSON.stringify(data));
       logger.debug(`Updating saucelabs ${requestPath}`);
 
-      const req = https.request({
-        hostname: "saucelabs.com",
-        path: requestPath,
+      const requestOptions = {
+        url: `https://saucelabs.com${requestPath}`,
         method: "PUT",
-        auth: `${config.tunnel.username}:${config.tunnel.accessKey}`,
-        headers: {
-          "Content-Type": "application/json",
-          "Content-Length": data.length
-        }
-      }, (res) => {
-        res.setEncoding("utf8");
-        logger.debug(`Response: ${res.statusCode}${JSON.stringify(res.headers)}`);
+        auth: {
+          user: config.tunnel.username,
+          pass: config.tunnel.accessKey
+        },
+        body: data,
+        json: true
+      };
 
-        res.on("data", (chunk) => {
-          logger.debug(`BODY: ${chunk}`);
-        });
-        res.on("end", () => {
+      if (settings.config.sauceOutboundProxy) {
+        requestOptions.proxy = settings.config.sauceOutboundProxy;
+        requestOptions.strictSSL = false;
+      }
+
+      request(requestOptions, (error, res, json) => {
+        if (error) {
+          logger.err("Error when posting update to Saucelabs session with request:");
+          logger.err(error);
           return callback();
-        });
+        }
+
+        logger.debug("Response from Saucelabs session update:");
+        logger.debug(JSON.stringify(json));
+        return callback(additionalLog);
       });
 
-      req.on("error", (e) => {
-        logger.err(`problem with request: ${e.message}`);
-      });
-      req.write(data);
-      req.end();
     } catch (err) {
-      logger.err(`Error${err}`);
+      logger.err(`Error ${err}`);
       return callback();
     }
   }
