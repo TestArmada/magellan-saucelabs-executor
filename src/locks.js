@@ -44,35 +44,41 @@ export default class Locks {
     const poll = () => {
       logger.debug("Asking for VM..");
 
-      return this.api.claim((error, token) => {
-        // Three possible outcomes to claims:
-        //
-        // 1) error
-        // 2) accepted claim, token received.
-        // 3) rejected claim, no token received.
+      try {
+        return this.api.claim((error, token) => {
+          // Three possible outcomes to claims:
+          //
+          // 1) error
+          // 2) accepted claim, token received.
+          // 3) rejected claim, no token received.
 
-        if (error) {
-          logger.err(`waited for ${Date.now() - pollingStartTime} , timeout is
-            ${this.options.locksOutageTimeout}`);
-          if (Date.now() - pollingStartTime > this.options.locksOutageTimeout) {
-            // we've been polling for too long. Bail!
-            return callback(new Error(`${"Gave up trying to get "
-              + "a saucelabs VM from locks server. "}${error}`));
+          if (error) {
+            logger.err(`waited for ${Date.now() - pollingStartTime} , timeout is
+              ${this.options.locksOutageTimeout}`);
+            if (Date.now() - pollingStartTime > this.options.locksOutageTimeout) {
+              // we've been polling for too long. Bail!
+              return callback(new Error(`${"Gave up trying to get "
+                + "a saucelabs VM from locks server. "}${error}`));
+            } else {
+              logger.err(`${"Error from locks server, tolerating error and" +
+                " waiting "}${this.options.locksPollingInterval}ms before trying again`);
+              return setTimeout(poll, this.options.locksPollingInterval);
+            }
+          }
+
+          if (token) {
+            return callback(null, { token });
           } else {
-            logger.err(`${"Error from locks server, tolerating error and" +
-              " waiting "}${this.options.locksPollingInterval}ms before trying again`);
+            logger.debug("Capacity saturated, waiting for clearance to claim next available VM..");
             return setTimeout(poll, this.options.locksPollingInterval);
           }
-        }
 
-        if (token) {
-          return callback(null, { token });
-        } else {
-          logger.debug("Capacity saturated, waiting for clearance to claim next available VM..");
-          return setTimeout(poll, this.options.locksPollingInterval);
-        }
-
-      });
+        });
+      } catch (e) {
+        logger.err("Internal exception while trying to claim a VM from Saucelabs:");
+        logger.err(e);
+        return callback(e);
+      }
     };
 
     return poll();

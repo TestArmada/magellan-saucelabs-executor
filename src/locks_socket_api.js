@@ -1,6 +1,29 @@
 import WebSocket from "ws";
 import logger from "./logger";
 
+//
+// How claims work:
+//
+// 1) An incoming claim callback is pushed to the claims queue by claim(). A claim request
+//    is then sent via the websocket.
+//
+// 2) Locks is expected to eventually respond with a message with a property called "accepted"
+//    set to true or false. There are three cases that can happen:
+//
+//    A) If accepted is set to false, this means the claim was rejected due to saturation, and
+//       the saucelabs executor should submit another claim after a short sleep time (as a
+//       courtesy to the locks server, which may be under high load during saturation).
+//
+//    B) If accepted is set to true, this means the claim was accepted and the message's token
+//       property should have a unique claim token (this token can be used to liberate the claim
+//       early with the release() function).   
+//
+//    C) An error. Not to be confused with a rejected claim, an error means the locks server
+//       is in an undefined state or cannot be reached. Things like gateway or network issues
+//       can fall into this case. The saucelabs executor can keep retrying until it's convinced
+//       that locks is experiencing an outage and it's appropriate to give up.
+//
+
 export default class LocksAPI {
   constructor(options, mockSocket = null) {
     this.mock = mockSocket ? true : false;
@@ -21,15 +44,18 @@ export default class LocksAPI {
       this._createSocket();
 
       this.socket.on("open", () => {
+        logger.debug("Locks websocket established");
         this.connected = true;
         return callback();
       });
 
       this.socket.on("error", (ev) => {
+        logger.debug("Locks websocket error");
         return callback(ev.error);
       });
 
       this.socket.on("close", () => {
+        logger.debug("Locks websocket closed");
         this.connected = false;
         return;
       });
@@ -58,7 +84,7 @@ export default class LocksAPI {
         // Reject unexpected or garbled messages
         const nextClaim = this.claims.shift();
         if (nextClaim) {
-          return nextClaim(new Error(`Unexpected message: ${message}`));
+          return nextClaim(new Error(`Received an unexpected message from locks server: ${message}`));
         }
 
         return null;
