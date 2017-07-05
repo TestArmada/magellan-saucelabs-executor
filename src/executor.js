@@ -11,16 +11,28 @@ let config = settings.config;
 let tunnel = null;
 let locks = null;
 
-export default {
+const Executor = {
   setupRunner: (mocks = null) => {
 
     let ILocks = Locks;
+
+    if (mocks && mocks.Locks) {
+      ILocks = mocks.Locks;
+    }
+
+    locks = new ILocks(config);
+
+    return Executor
+      .setupTunnels(mocks)
+      .then(() => {
+        return locks.initialize();
+      });
+  },
+
+  setupTunnels: (mocks = null) => {
     let ITunnel = Tunnel;
 
     if (mocks) {
-      if (mocks.Locks) {
-        ILocks = mocks.Locks;
-      }
       if (mocks.Tunnel) {
         ITunnel = mocks.Tunnel;
       }
@@ -28,8 +40,6 @@ export default {
         config = mocks.config;
       }
     }
-
-    locks = new ILocks(config);
 
     if (config.useTunnels) {
       // create new tunnel if needed
@@ -73,6 +83,9 @@ export default {
       config = mocks.config;
     }
 
+    // shut down locks
+    locks.teardown();
+
     // close tunnel if needed
     if (tunnel && config.useTunnels) {
       return tunnel
@@ -92,7 +105,8 @@ export default {
   },
 
   teardownTest: (info, callback) => {
-    locks.release(info, callback);
+    locks.release(info);
+    callback(info);
   },
 
   execute: (testRun, options, mocks = null) => {
@@ -172,5 +186,6 @@ export default {
     }
   }
 
-
 };
+
+module.exports = Executor;

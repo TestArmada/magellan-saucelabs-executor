@@ -1,4 +1,4 @@
-const executor = require("./lib/executor").default;
+const executor = require("./lib/executor");
 const configuration = require("./lib/configuration").default;
 const profile = require("./lib/profile").default;
 const help = require("./lib/help").default;

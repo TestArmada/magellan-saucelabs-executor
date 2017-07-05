@@ -1,112 +1,94 @@
-import request from "request";
 import _ from "lodash";
 import logger from "./logger";
+import LocksAPI from "./locks_socket_api";
 
 export default class Locks {
-  constructor(options, requestMock = null) {
+  constructor(options, apiMock = null) {
     this.options = _.assign({}, options);
-    this.request = request;
+    this.apiMock = apiMock;
+  }
 
-    if (requestMock) {
-      this.request = requestMock;
-    }
-
+  initialize() {
     if (this.options.locksServerLocation) {
+      this.api = this.apiMock || new LocksAPI(this.options);
+
       logger.log(`Using locks server at ${this.options.locksServerLocation
-        } for VM traffic control.`);
+      } for VM traffic control.`);
+
+      return new Promise((resolve, reject) => {
+        this.api.connect((err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
+    } else {
+      return Promise.resolve();
     }
   }
 
+  //
+  // 1) Attempt to claim a VM. If the claim is accepted, return the token.
+  // 2) If rejected or given an error, wait, then try again (poll)
+  // 3) If max polling time is reached, abandon the claim and return an error.
+  //
   acquire(callback) {
-    if (this.options.locksServerLocation) {
-      // this will block untill lock server returns a valid vm token
-      //
-      // http://0.0.0.0:3000/claim
-      //
-      // {"accepted":false,"message":"Claim rejected. No VMs available."}
-      // {"accepted":true,"token":null,"message":"Claim accepted"}
-      //
-      const pollingStartTime = Date.now();
+    if (!this.api) {
+      return callback();
+    }
 
-      // Poll the worker allocator until we have a known-good port, then run this test
-      const poll = () => {
-        logger.debug("asking for VM..");
+    const pollingStartTime = Date.now();
 
-        /*eslint-disable consistent-return*/
-        return this.request.post({
-          url: `${this.options.locksServerLocation}/claim`,
-          timeout: this.options.locksRequestTimeout,
-          form: {}
-        }, (error, response, body) => {
-          try {
-            if (error) {
-              return callback(new Error(error));
-            }
-            const result = JSON.parse(body);
-            if (result) {
-              if (result.accepted) {
-                logger.debug(`VM claim accepted, token: ${result.token}`);
+    const poll = () => {
+      logger.debug("Asking for VM..");
 
-                return callback(null, { token: result.token });
-              } else {
-                logger.debug("VM claim not accepted, waiting to try again ..");
-                // If we didn't get a worker, try again
-                return callback(new Error("Request not accepted"));
-              }
-            } else {
-              return callback(new Error(`Result from locks server is invalid or empty: '${
-                result}'`));
-            }
-          } catch (e) {
-            // NOTE: There are several errors that can happen in the above code:
-            //
-            // 1. Parsing - we got a response from locks, but it's malformed
-            // 2. Interpretation - we could parse a result, but it's empty or weird
-            // 3. Connection - we attempted to connect, but timed out, 404'd, etc.
-            //
-            // All of the above errors end up here so that we can indiscriminately
-            // choose to tolerate all types of errors until we've waited too long.
-            // This allows for the locks server to be in a bad state (whether due
-            // to restart, failure, network outage, or whatever) for some amount of
-            // time before we panic and start failing tests due to an outage.
+      try {
+        return this.api.claim((error, token) => {
+          // Three possible outcomes to claims:
+          //
+          // 1) error
+          // 2) accepted claim, token received.
+          // 3) rejected claim, no token received.
+
+          if (error) {
+            logger.err(`waited for ${Date.now() - pollingStartTime} , timeout is
+              ${this.options.locksOutageTimeout}`);
             if (Date.now() - pollingStartTime > this.options.locksOutageTimeout) {
               // we've been polling for too long. Bail!
               return callback(new Error(`${"Gave up trying to get "
-                + "a saucelabs VM from locks server. "}${e}`));
+                + "a saucelabs VM from locks server. "}${error}`));
             } else {
-              logger.debug(`${"Error from locks server, tolerating error and" +
-                " waiting "}${this.options.locksPollingInterval
-                }ms before trying again`);
-              setTimeout(poll, this.options.locksPollingInterval);
+              logger.err(`${"Error from locks server, tolerating error and" +
+                " waiting "}${this.options.locksPollingInterval}ms before trying again`);
+              return setTimeout(poll, this.options.locksPollingInterval);
             }
           }
-        });
-      };
 
-      return poll();
-    } else {
-      return callback();
-    }
+          if (token) {
+            return callback(null, { token });
+          } else {
+            logger.debug("Capacity saturated, waiting for clearance to claim next available VM..");
+            return setTimeout(poll, this.options.locksPollingInterval);
+          }
+
+        });
+      } catch (e) {
+        logger.err("Internal exception while trying to claim a VM from Saucelabs:");
+        logger.err(e);
+        return callback(e);
+      }
+    };
+
+    return poll();
   }
 
-  release(token, callback) {
-    if (this.options.locksServerLocation) {
-      return this.request({
-        method: "POST",
-        json: true,
-        timeout: this.options.locksRequestTimeout,
-        body: {
-          token
-        },
-        url: `${this.options.locksServerLocation}/release`
-      }, () => {
-        // TODO: decide whether we care about an error at this stage. We're releasing
-        // this worker whether the remote release is successful or not, since it will
-        // eventually be timed out by the locks server.
-        return callback();
-      });
-    } else {
-      return callback();
-    }
+  release(token) {
+    this.api.release(token);
+  }
+
+  teardown() {
+    this.api.close();
   }
 }

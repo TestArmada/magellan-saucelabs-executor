@@ -37,6 +37,7 @@
     "lodash": "^4.17.4",
     "request": "^2.81.0",
     "sauce-connect-launcher": "^1.2.0",
+    "ws": "^2.2.3",
     "yargs": "^6.6.0"
   },
   "devDependencies": {
