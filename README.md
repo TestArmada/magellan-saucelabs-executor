@@ -6,26 +6,37 @@
 
 Executor for [Magellan](https://github.com/TestArmada/magellan) to run [nightwatchjs](http://nightwatchjs.org/) tests in [Saucelabs](https://saucelabs.com/) environment.
 
-**PLEASE NOTE: Executor is only supported by magellan version 10.0.0 or higher**.
+# Important Notes About Versions
+
+## Magellan Version Compatibility
+
+Important: `testarmada-magellan-saucelabs-executor` is only supported by magellan version `10.0.0` or higher.
+
+## Locks Version Compatibility
+
+If you are running a version of `testarmada-magellan-saucelabs-executor` version `4.x.x` or higher and also use [Locks](https://github.com/TestArmada/locks) to traffic control your Saucelabs VM allocation, then you should run a minimum of `locks@3.x.x`. Earlier versions of Locks do not expose a websocket, which is what executor `4.x.x` or higher expects.
 
 ## What does this executor do
- 1. It manages [Sauce Connect](https://wiki.saucelabs.com/display/DOCS/Sauce+Connect+Proxy) if you test needs it
- 2. It talks [Guacamole](https://github.com/TestArmada/guacamole) so that the desiredCapabilities shrinks down to a string, which makes your browser selection an easy work
- 3. It collaborates with [Locks](https://github.com/TestArmada/locks) to schedule the traffic intelligently
- 4. It reports test result to Saucelabs automatically
- 5. It runs nightwatch test by forking it as magellan child process
+
+ 1. It manages [Sauce Connect](https://wiki.saucelabs.com/display/DOCS/Sauce+Connect+Proxy) if your tests need it.
+ 2. It talks [Guacamole](https://github.com/TestArmada/guacamole) so that the desiredCapabilities shrinks down to a string, which makes managing your browser selection easier.
+ 3. It collaborates with [Locks](https://github.com/TestArmada/locks) to schedule the VM acquisition traffic intelligently, preventing a rise in errors when your Sauce capacity is saturated.
+ 4. It reports test result to Saucelabs automatically.
+ 5. It runs tests by forking the test framework (i.e. Nightwatch, etc) it as `magellan` child process.
 
 ## How To Use
-Please follow the steps
+
+Please follow the following steps:
 
  1. `npm install testarmada-magellan-saucelabs-executor --save`
- 2. add following block to your `magellan.json` (if there isn't a `magellan.json` please create one under your folder root)
+ 2. Add following the block to your `magellan.json` (if there isn't a `magellan.json` please create one under your folder root):
+
  ```javascript
  "executors": [
     "testarmada-magellan-saucelabs-executor"
  ]
  ```
- 3. set env variables
+ 3. Set environment variables:
  ```
  export SAUCE_CONNECT_VERSION=${VERSION}
  export SAUCE_USERNAME=${USERNAME}
