@@ -16,7 +16,7 @@ import logger from "./logger";
 //
 //    B) If accepted is set to true, this means the claim was accepted and the message's token
 //       property should have a unique claim token (this token can be used to liberate the claim
-//       early with the release() function).   
+//       early with the release() function).
 //
 //    C) An error. Not to be confused with a rejected claim, an error means the locks server
 //       is in an undefined state or cannot be reached. Things like gateway or network issues
@@ -84,7 +84,8 @@ export default class LocksAPI {
         // Reject unexpected or garbled messages
         const nextClaim = this.claims.shift();
         if (nextClaim) {
-          return nextClaim(new Error(`Received an unexpected message from locks server: ${message}`));
+          return nextClaim(new Error(`Received an unexpected message `
+            + `from locks server: ${message}`));
         }
 
         return null;
