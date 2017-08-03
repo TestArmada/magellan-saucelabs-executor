@@ -27,6 +27,19 @@ export default {
     "example": "testtunnel123123",
     "description": "Use an existing secure tunnel (exclusive with --sauce_create_tunnels)"
   },
+  "sauce_app": {
+    "visible": true,
+    "type": "string",
+    "example": "sauce-storage:your_app.apk",
+    "description": "Specify the app name in sauce temporary storage"
+  },
+  "sauce_app_capabilities_config": {
+    "visible": true,
+    "type": "string",
+    "example": "sauceAppCapabilitiesConfig.json",
+    "description": "Specify a configuration file containing customized appium "
+      + "desiredCapabilities for saucelabs VM"
+  },
   "shared_sauce_parent_account": {
     "visible": true,
     "type": "string",

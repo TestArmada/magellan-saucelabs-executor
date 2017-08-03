@@ -135,9 +135,12 @@ describe("Locks", () => {
   describe("release lock", () => {
     it("no lock server configured", () => {
       locks = new Locks({}, mockLocksAPI);
-      expect(() => {
+      
+      try{
         locks.release("FAKE_TOKEN");
-      }).to.throw(Error);
+      }catch(e){
+        assert(false, "shouldn't reach here");
+      }
     });
 
     it("lock server called", (done) => {

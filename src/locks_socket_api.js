@@ -84,7 +84,7 @@ export default class LocksAPI {
         // Reject unexpected or garbled messages
         const nextClaim = this.claims.shift();
         if (nextClaim) {
-          return nextClaim(new Error(`Received an unexpected message `
+          return nextClaim(new Error("Received an unexpected message "
             + `from locks server: ${message}`));
         }
 
@@ -111,7 +111,7 @@ export default class LocksAPI {
 
   claim(callback) {
     this.claims.push(callback);
-    this.socket.send(JSON.stringify({type: "claim"}));
+    this.socket.send(JSON.stringify({ type: "claim" }));
   }
 
   release(token) {

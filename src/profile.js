@@ -3,6 +3,7 @@ import SauceBrowsers from "guacamole";
 import listSauceCliBrowsers from "guacamole/src/cli_list";
 import { argv } from "yargs";
 import logger from "./logger";
+import settings from "./settings";
 
 const FIREFOX_MARIONETTE = 48;
 
@@ -14,6 +15,26 @@ const _patchFirefox = (capabilities) => {
   }
 
   return capabilities;
+};
+
+const _patchAppium = (capabilities) => {
+  let tempCap = _.cloneDeep(capabilities);
+  // for customized app capabilities
+  if (settings.config.appCapabilitiesConfig) {
+    tempCap = _.merge(capabilities,
+      settings.config.appCapabilitiesConfig);
+  }
+
+  // if app location is passed via command line arg
+  if (settings.config.app) {
+    tempCap.app = settings.config.app;
+  }
+
+  if (tempCap.app) {
+    delete tempCap.browserName;
+  }
+
+  return tempCap;
 };
 
 export default {
@@ -71,6 +92,8 @@ export default {
               id: runArgv.sauce_browser
             };
 
+            p.desiredCapabilities = _patchAppium(p.desiredCapabilities);
+
             logger.debug(`detected profile: ${JSON.stringify(p)}`);
 
             resolve(p);
@@ -89,6 +112,8 @@ export default {
                 // id is for magellan reporter
                 id: b
               };
+
+              p.desiredCapabilities = _patchAppium(p.desiredCapabilities);
 
               returnBrowsers.push(p);
             });
@@ -138,11 +163,10 @@ export default {
             // for appium test
             if (profile.appium) {
               p.desiredCapabilities = _.merge(p.desiredCapabilities, profile.appium);
-
-              if (p.desiredCapabilities.app) {
-                delete p.desiredCapabilities.browserName;
-              }
             }
+
+            p.desiredCapabilities = _patchAppium(p.desiredCapabilities);
+
             resolve(p);
           } catch (e) {
             reject(`Executor sauce cannot resolve profile ${
