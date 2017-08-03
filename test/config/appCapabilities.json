@@ -1,0 +1,7 @@
+{
+  "appiumVersion": "1.6.5",
+  "automationName": "xcuitest",
+  "sendKeyStrategy": "setValue",
+  "waitForAppScript": "true",
+  "platform": "OSX"
+}

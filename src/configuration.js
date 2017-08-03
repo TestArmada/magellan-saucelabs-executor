@@ -10,12 +10,12 @@ const _loadConfig = (filename) => {
   try {
     /*eslint-disable global-require*/
     const config = require(filepath);
-    logger.log(`Loaded tunnel config file ${filename}`);
-    logger.debug(`Tunnel config from ${filename}:`);
+    logger.log(`Loaded config file ${filename}`);
+    logger.debug(`Loading config from ${filename}:`);
     logger.debug(`${JSON.stringify(config)}`);
     return _.cloneDeep(config);
   } catch (err) {
-    logger.err(`Cannot load tunnel config file from ${filename}`);
+    logger.err(`Cannot load config file from ${filename}`);
     logger.err(err);
     throw new Error(err);
   }
@@ -59,6 +59,16 @@ export default {
     // optional:
     if (runArgv.sauce_tunnel_id) {
       settings.config.tunnel.tunnelIdentifier = runArgv.sauce_tunnel_id;
+    }
+
+    // optional:
+    if (runArgv.sauce_app) {
+      settings.config.app = runArgv.sauce_app;
+    }
+
+    // optional:
+    if (runArgv.sauce_app_capabilities_config) {
+      settings.config.appCapabilitiesConfig = _loadConfig(runArgv.sauce_app_capabilities_config);
     }
 
     // optional: *Outbound* HTTP Sauce-specific proxy configuration. Note

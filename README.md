@@ -51,6 +51,8 @@ Please follow the following steps:
    --sauce_list_browsers                List the available browsers configured (Guacamole integrated).
    --sauce_create_tunnels               undefined
    --sauce_tunnel_id=testtunnel123123   Use an existing secure tunnel (exclusive with --sauce_create_tunnels)
+   --sauce_app=sauce-storage:your_app.apSpecify the app name in sauce temporary storage
+   --sauce_app_capabilities_config=sauceSpecify a configuration file containing customized appium desiredCapabilities for saucelabs VM
    --shared_sauce_parent_account=testsauSpecify parent account name if existing shared secure tunnel is  in use (exclusive with --sauce_create_tunnels)
  ```
 
@@ -92,12 +94,34 @@ tunnel config json example
 
 For all supported flags please refer to [here](https://github.com/bermi/sauce-connect-launcher#advanced-usage).
 
+## Customize appium desiredCapabilities (for app and mobile web test only)
+
+`testarmada-magellan-saucelabs-executor` supports customized appium desiredCapabilities in `.json` file via `--sauce_app_capabilities_config`. Any content in the `.json` file will be merged into desiredCapabilities directly.
+
+```javascript
+customized appium desiredCapabilities file
+
+{
+  "appiumVersion": "1.6.5",
+  "automationName": "XCUITest",
+  "sendKeyStrategy": "setValue"
+}
+```
+
 ### Loading rules for env variables and customized flags
 
 Some parameters can be passed in from both env variables and customized flags (such as `SAUCE_USERNAME` from env variables and `username` from flags). It is very important to understand which one will take effect if set up both.
 
  1. env variable always has top priority.
  2. customized flags only work when no corresponding env variable set
+
+### Loading rules for command line args, profile and configuration file content
+
+Some arguments can be passed in to excutor from both command line args, profile and configuration files, for example the temporary app location on saucelabs. The rule for deciding the final value of such argument is ordered as following
+
+ 1. configuration file content
+ 2. profile
+ 3. command line args (except `--sauce_app`, command line value of `--sauce_app` has the top priority)
 
 ## Example
 To run test in latest chrome on Windows10 without a tunnel

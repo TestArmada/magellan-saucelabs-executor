@@ -13,7 +13,7 @@ export default class Locks {
       this.api = this.apiMock || new LocksAPI(this.options);
 
       logger.log(`Using locks server at ${this.options.locksServerLocation
-      } for VM traffic control.`);
+        } for VM traffic control.`);
 
       return new Promise((resolve, reject) => {
         this.api.connect((err) => {
@@ -85,10 +85,16 @@ export default class Locks {
   }
 
   release(token) {
+    if (!this.api) {
+      return;
+    }
     this.api.release(token);
   }
 
   teardown() {
+    if (!this.api) {
+      return;
+    }
     this.api.close();
   }
 }
