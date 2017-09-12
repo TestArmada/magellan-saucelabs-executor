@@ -1,5 +1,7 @@
 import profile from "../../lib/profile";
+import configuration from "../../lib/configuration";
 import chai from "chai";
+import path from "path";
 import chaiAsPromise from "chai-as-promised";
 import _ from "lodash";
 
@@ -81,6 +83,18 @@ describe("Profile", () => {
 
   describe("getProfiles", () => {
     it("with sauce_browser", () => {
+      let settings = configuration.getConfig();
+
+      settings.appCapabilitiesConfig = {
+        chrome_latest_Windows_10_Desktop: {
+          "appiumVersion": "1.6.6",
+          "automationName": "XCUITest",
+          "sendKeyStrategy": "setValue",
+          "locationServicesAuthorized": "false",
+          "bundleId": "com.beta.electronics",
+          "locationServicesEnabled": "true"
+        }
+      };
       let argvMock = {
         sauce_browser: "chrome_latest_Windows_10_Desktop"
       };
@@ -89,11 +103,19 @@ describe("Profile", () => {
         .getProfiles({}, argvMock)
         .then((profile) => {
           expect(profile.desiredCapabilities.browserName).to.equal("chrome");
-          expect(profile.desiredCapabilities.version).to.equal("59");
+          expect(profile.desiredCapabilities.version).to.equal("61");
           expect(profile.desiredCapabilities.platform).to.equal("Windows 10");
+          expect(profile.desiredCapabilities.appiumVersion).to.equal("1.6.6");
+          expect(profile.desiredCapabilities.automationName).to.equal("XCUITest");
+          expect(profile.desiredCapabilities.sendKeyStrategy).to.equal("setValue");
+          expect(profile.desiredCapabilities.locationServicesAuthorized).to.equal("false");
+          expect(profile.desiredCapabilities.bundleId).to.equal("com.beta.electronics");
+          expect(profile.desiredCapabilities.locationServicesEnabled).to.equal("true");
           expect(profile.executor).to.equal("sauce");
           expect(profile.nightwatchEnv).to.equal("sauce");
           expect(profile.id).to.equal("chrome_latest_Windows_10_Desktop");
+
+          delete settings.appCapabilitiesConfig;
         });
     });
 
@@ -102,22 +124,59 @@ describe("Profile", () => {
         sauce_browsers: "chrome_latest_Windows_10_Desktop, safari_10_OS_X_10_11_Desktop"
       };
 
+      let settings = configuration.getConfig();
+      settings.appCapabilitiesConfig = {
+        chrome_latest_Windows_10_Desktop: {
+          "appiumVersion": "1.6.6",
+          "automationName": "XCUITest",
+          "sendKeyStrategy": "setValue",
+          "locationServicesAuthorized": "false",
+          "bundleId": "com.beta.electronics",
+          "locationServicesEnabled": "true"
+        },
+        safari_10_OS_X_10_11_Desktop: {
+          "appiumVersion": "1.6.6",
+          "automationName": "XCUITest",
+          "sendKeyStrategy": "setValue",
+          "locationServicesAuthorized": "false",
+          "bundleId": "com.beta.electronics",
+          "locationServicesEnabled": "true"
+        }
+      };
+
+
       return profile
         .getProfiles({}, argvMock)
         .then((profiles) => {
           expect(profiles.length).to.equal(2);
           expect(profiles[0].desiredCapabilities.browserName).to.equal("chrome");
-          expect(profiles[0].desiredCapabilities.version).to.equal("59");
+          expect(profiles[0].desiredCapabilities.version).to.equal("61");
           expect(profiles[0].desiredCapabilities.platform).to.equal("Windows 10");
+          expect(profiles[0].desiredCapabilities.appiumVersion).to.equal("1.6.6");
+          expect(profiles[0].desiredCapabilities.automationName).to.equal("XCUITest");
+          expect(profiles[0].desiredCapabilities.sendKeyStrategy).to.equal("setValue");
+          expect(profiles[0].desiredCapabilities.locationServicesAuthorized).to.equal("false");
+          expect(profiles[0].desiredCapabilities.bundleId).to.equal("com.beta.electronics");
+          expect(profiles[0].desiredCapabilities.locationServicesEnabled).to.equal("true");
+
           expect(profiles[0].executor).to.equal("sauce");
           expect(profiles[0].nightwatchEnv).to.equal("sauce");
           expect(profiles[0].id).to.equal("chrome_latest_Windows_10_Desktop");
           expect(profiles[1].desiredCapabilities.browserName).to.equal("safari");
           expect(profiles[1].desiredCapabilities.version).to.equal("10");
           expect(profiles[1].desiredCapabilities.platform).to.equal("OS X 10.11");
+          expect(profiles[1].desiredCapabilities.appiumVersion).to.equal("1.6.6");
+          expect(profiles[1].desiredCapabilities.automationName).to.equal("XCUITest");
+          expect(profiles[1].desiredCapabilities.sendKeyStrategy).to.equal("setValue");
+          expect(profiles[1].desiredCapabilities.locationServicesAuthorized).to.equal("false");
+          expect(profiles[1].desiredCapabilities.bundleId).to.equal("com.beta.electronics");
+          expect(profiles[1].desiredCapabilities.locationServicesEnabled).to.equal("true");
+
           expect(profiles[1].executor).to.equal("sauce");
           expect(profiles[1].nightwatchEnv).to.equal("sauce");
           expect(profiles[1].id).to.equal("safari_10_OS_X_10_11_Desktop");
+
+          delete settings.appCapabilitiesConfig;
         });
     });
 
@@ -172,6 +231,71 @@ describe("Profile", () => {
           expect(result.id).to.equal("iphone_9_2_iOS_iPhone_Simulator");
         });
     });
+
+    it("appCapabilitiesConfig valid", () => {
+      let p = {
+        "browser": "iphone_10_3_iOS_iPhone_7_Simulator",
+        "orientation": "portrait",
+        "appCapabilitiesConfig": "./test/config/app-capabilities-config.js",
+        "appium": {
+          "appiumVersion": "1.6.1", // exists in appCapabilitiesConfig too,
+          "waitForAppScript": "true", // local to this config
+        }
+      };
+
+      return profile
+        .getCapabilities(p)
+        .then((result) => {
+          expect(result.desiredCapabilities.browserName).to.equal(undefined);
+          expect(result.desiredCapabilities.version).to.equal("10.3");
+          expect(result.desiredCapabilities.platform).to.equal("iOS");
+          expect(result.desiredCapabilities.deviceName).to.equal("iPhone 7 Simulator");
+          expect(result.desiredCapabilities.app).to.equal("sauce-storage:App.zip");
+          expect(result.desiredCapabilities.appiumVersion).to.equal("1.6.5");
+          expect(result.desiredCapabilities.automationName).to.equal("XCUITest");
+          expect(result.desiredCapabilities.sendKeyStrategy).to.equal("setValue");
+          expect(result.desiredCapabilities.waitForAppScript).to.equal("true");
+          expect(result.desiredCapabilities.locationServicesAuthorized).to.equal("false");
+          expect(result.desiredCapabilities.bundleId).to.equal("com.beta.electronics");
+          expect(result.desiredCapabilities.deviceOrientation).to.equal("portrait");
+          expect(result.id).to.equal("iphone_10_3_iOS_iPhone_7_Simulator");
+      });
+
+    });
+
+
+    it("appCapabilitiesConfig if non existent appCapabilitiesConfig", () => {
+      let p = {
+        "browser": "iphone_10_3_iOS_iPhone_7_Simulator",
+        "orientation": "portrait",
+        "appCapabilitiesConfig": "./test/config/does-not-exist.js"
+      };
+
+      return profile
+          .getCapabilities(p)
+          .catch((error) => {
+            expect(error).to.not.be.undefined;
+            expect(error).to.equal('Executor sauce cannot resolve profile {"browser":"iphone_10_3_iOS_iPhone_7_Simulator","orientation":"portrait","appCapabilitiesConfig":"./test/config/does-not-exist.js"}');
+          });
+    });
+
+
+    it("appCapabilitiesConfig if browser is not found in appCapabilitiesConfig", () => {
+      let p = {
+        "browser": "invalid_browser_key",
+        "orientation": "portrait",
+        "appCapabilitiesConfig": "./test/config/app-capabilities-config.js"
+      };
+
+    return profile
+        .getCapabilities(p)
+        .catch((error) => {
+          expect(error).to.not.be.undefined;
+          expect(error).to.equal('Executor sauce cannot resolve profile {"browser":"invalid_browser_key","orientation":"portrait","appCapabilitiesConfig":"./test/config/app-capabilities-config.js"}');
+    });
+});
+
+
   });
 
   describe("listBrowsers", () => {

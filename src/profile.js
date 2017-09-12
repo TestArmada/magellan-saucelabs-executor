@@ -1,4 +1,5 @@
 import _ from "lodash";
+import path from "path";
 import SauceBrowsers from "guacamole";
 import listSauceCliBrowsers from "guacamole/src/cli_list";
 import { argv } from "yargs";
@@ -6,6 +7,15 @@ import logger from "./logger";
 import settings from "./settings";
 
 const FIREFOX_MARIONETTE = 48;
+
+const _mergeCapabilities = (capabilities, capsConfig, browser) => {
+  if (capsConfig && capsConfig[browser]) {
+    capabilities = _.merge(capabilities, capsConfig[browser]);
+    logger.debug(`DesiredCapabilities after merging appCapabilitiesConfig for browser ${browser}`);
+    logger.debug(JSON.stringify(capabilities));
+  }
+  return capabilities;
+};
 
 const _patchFirefox = (capabilities) => {
   if (capabilities.browserName === "firefox"
@@ -17,13 +27,10 @@ const _patchFirefox = (capabilities) => {
   return capabilities;
 };
 
-const _patchAppium = (capabilities) => {
+const _patchAppium = (capabilities, browser) => {
   let tempCap = _.cloneDeep(capabilities);
   // for customized app capabilities
-  if (settings.config.appCapabilitiesConfig) {
-    tempCap = _.merge(capabilities,
-      settings.config.appCapabilitiesConfig);
-  }
+  tempCap = _mergeCapabilities(tempCap, settings.config.appCapabilitiesConfig, browser);
 
   // if app location is passed via command line arg
   if (settings.config.app) {
@@ -35,6 +42,27 @@ const _patchAppium = (capabilities) => {
   }
 
   return tempCap;
+};
+
+const _mergeLocalAppiumCapabilities = (appCapabilitiesConfig, browser, capabilities) => {
+  // for appCapabilitiesConfig
+  logger.debug(appCapabilitiesConfig);
+  let appCapabilitiesConfigPath;
+
+  try {
+    appCapabilitiesConfigPath = path.resolve(process.cwd(), appCapabilitiesConfig);
+    logger.debug(`Requiring ${appCapabilitiesConfigPath}`);
+    /* eslint-disable global-require */
+    const capabilitiesConfig = require(appCapabilitiesConfigPath);
+    /* eslint-enable global-require */
+
+    capabilities = _mergeCapabilities(capabilities, capabilitiesConfig, browser);
+  } catch (e) {
+    logger.log(`Could not load ${appCapabilitiesConfigPath}.
+                Does the file exist or is it a valid JSON or JS file ?`);
+  }
+
+  return capabilities;
 };
 
 export default {
@@ -91,8 +119,7 @@ export default {
               nightwatchEnv: "sauce",
               id: runArgv.sauce_browser
             };
-
-            p.desiredCapabilities = _patchAppium(p.desiredCapabilities);
+            p.desiredCapabilities = _patchAppium(p.desiredCapabilities, runArgv.sauce_browser);
 
             logger.debug(`detected profile: ${JSON.stringify(p)}`);
 
@@ -113,7 +140,7 @@ export default {
                 id: b
               };
 
-              p.desiredCapabilities = _patchAppium(p.desiredCapabilities);
+              p.desiredCapabilities = _patchAppium(p.desiredCapabilities, b);
 
               returnBrowsers.push(p);
             });
@@ -159,14 +186,16 @@ export default {
               nightwatchEnv: profile.executor,
               id: prof.id
             };
-
             // for appium test
             if (profile.appium) {
               p.desiredCapabilities = _.merge(p.desiredCapabilities, profile.appium);
             }
-
-            p.desiredCapabilities = _patchAppium(p.desiredCapabilities);
-
+            if (profile.appCapabilitiesConfig) {
+              p.desiredCapabilities = _mergeLocalAppiumCapabilities(profile.appCapabilitiesConfig,
+                profile.browser,
+                p.desiredCapabilities);
+            }
+            p.desiredCapabilities = _patchAppium(p.desiredCapabilities, profile.browser);
             resolve(p);
           } catch (e) {
             reject(`Executor sauce cannot resolve profile ${
