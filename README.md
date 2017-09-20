@@ -96,17 +96,103 @@ For all supported flags please refer to [here](https://github.com/bermi/sauce-co
 
 ## Customize appium desiredCapabilities (for app and mobile web test only)
 
-`testarmada-magellan-saucelabs-executor` supports customized appium desiredCapabilities in `.json` file via `--sauce_app_capabilities_config`. Any content in the `.json` file will be merged into desiredCapabilities directly.
+`testarmada-magellan-saucelabs-executor` supports customized `appium` desiredCapabilies. A user can directly put all the desired `appium` capabilities in a `profile` as shown below:
 
-```javascript
-customized appium desiredCapabilities file
-
+```
+"chrome-android": [
 {
-  "appiumVersion": "1.6.5",
-  "automationName": "XCUITest",
-  "sendKeyStrategy": "setValue"
+    "browser": "Android_GoogleAPI_Emulator_Android_7_0_Android",
+    "orientation": "portrait",
+    "appium": {
+        "browserName": "Chrome",
+        "appiumVersion": "1.6.5",
+        "platformName": "Android",
+        "platformVersion": "7.0"
+    }
+}
+]
+```
+
+Also, a user can define the desired capabilities in a `json` or `js` file specified by `appiumCapabilitiesConfig` as shown below.
+
+```
+"chrome-android": [
+{
+    "browser": "Android_GoogleAPI_Emulator_Android_7_0_Android",
+    "orientation": "portrait",
+    "appCapabilitiesConfig": "./config/appium-capabilities.json"
+    "appium": {
+        "browserName": "Chrome",
+        "appiumVersion": "1.6.5",
+        "platformName": "Android",
+        "platformVersion": "7.0"
+    }
+}
+]
+```
+
+Example of `appium-capabilities.json`
+```javascript
+{
+   "Android_GoogleAPI_Emulator_Android_7_0_Android": {
+       "automationName": "XCUITest",
+       "sendKeyStrategy": "setValue",
+       "waitForAppScript": "true",
+       "locationServicesAuthorized": "false"
+   },
+   "Android_GoogleAPI_Emulator_Android_7_1_Android": {
+       "automationName": "XCUITest",
+       "sendKeyStrategy": "setValue",
+       "waitForAppScript": "false",
+       "locationServicesAuthorized": "true"
+   }
 }
 ```
+
+Example of `appium-capabilities.js`
+```javascript
+ 'use strict';
+
+ const APPIUM_VERSION = process.env.APPIUM_VERSION;
+
+ module.exports = {
+   "Android_GoogleAPI_Emulator_Android_7_0_Android": {
+       "appiumVersion": `${APPIUM_VERSION}`
+       "automationName": "XCUITest",
+       "sendKeyStrategy": "setValue",
+       "waitForAppScript": "true",
+       "locationServicesAuthorized": "false"
+   },
+   "Android_GoogleAPI_Emulator_Android_7_1_Android": {
+       "appiumVersion": `${APPIUM_VERSION}`
+       "automationName": "XCUITest",
+       "sendKeyStrategy": "setValue",
+       "waitForAppScript": "false",
+       "locationServicesAuthorized": "true"
+   }
+}
+```
+Using a `js` file is especially useful when you want to add a dynamic value to a property. e.g from an environment variable
+
+Note that the desired capabilities for the browser should be placed under its key e.g `Android_GoogleAPI_Emulator_Android_7_0_Android`. The file can contain more than one browsers as shown in the example.
+
+You can further merge the customized appium desired capabilities via `--sauce_app_capabilities_config`. Any content in the `.json` file will be merged into desiredCapabilities directly.
+
+`customized appium desired capabilities`
+```javascript
+"Android_GoogleAPI_Emulator_Android_7_0_Android" : {
+  {
+    "appiumVersion": "1.6.5",
+    "automationName": "XCUITest",
+    "sendKeyStrategy": "setValue"
+  }
+}
+
+```
+
+If the browser key is not found in the configuration files (`appCapabilitiesConfig` or `--sauce_app_capabilities_config`), no capabilities are merged from the configuration files.
+
+Note that the desired capabilities from `--sauce_app_capabilities_config` and `appCapabilities` are merged into the local `appium` capabilities with `--sauce_app_capabilities_config` taking precedence over the capabilities from `appCapabilitiesConfig` which in turn takes precedence over the local `appium` capabilities.
 
 ### Loading rules for env variables and customized flags
 
