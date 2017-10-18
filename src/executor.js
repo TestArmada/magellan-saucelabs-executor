@@ -140,46 +140,68 @@ const Executor = {
         additionalLog = logger.stringifyWarn(`Saucelabs replay can be found at https://saucelabs.com/tests/${sessionId}\n`);
       }
 
-      const requestPath = `/rest/v1/${config.tunnel.username}/jobs/${sessionId}`;
-      const data = {
-        "passed": testResult.result,
-        // TODO: remove this
-        "build": magellanBuildId,
-        "public": "team"
-      };
-
-      logger.debug("Data posting to SauceLabs job:");
-      logger.debug(JSON.stringify(data));
-      logger.debug(`Updating saucelabs ${requestPath}`);
-
-      const requestOptions = {
-        url: `https://saucelabs.com${requestPath}`,
-        method: "PUT",
+      // retrieve account visibility from saucelabs
+      request({
+        url: `https://saucelabs.com/rest/v1/users/${config.tunnel.username}`,
+        method: "GET",
         auth: {
           user: config.tunnel.username,
           pass: config.tunnel.accessKey
         },
-        body: data,
+        body: {},
         json: true
-      };
-
-      if (settings.config.sauceOutboundProxy) {
-        requestOptions.proxy = settings.config.sauceOutboundProxy;
-        requestOptions.strictSSL = false;
-      }
-
-      request(requestOptions, (error, res, json) => {
-        if (error) {
-          logger.err("Error when posting update to Saucelabs session with request:");
-          logger.err(error);
+      }, (verror, vres, vjson) => {
+        if (verror) {
+          logger.err(`Error when getting saucelabs account detail for ${config.tunnel.username}:`);
+          logger.err(verror);
           return callback();
         }
 
-        logger.debug("Response from Saucelabs session update:");
-        logger.debug(JSON.stringify(json));
-        return callback(additionalLog);
-      });
+        logger.debug("Response from Saucelabs account detail");
+        logger.debug(JSON.stringify(vjson));
 
+        const visibility = vjson.is_public ? "public" : "team";
+
+        const requestPath = `/rest/v1/${config.tunnel.username}/jobs/${sessionId}`;
+        const data = {
+          "passed": testResult.result,
+          // TODO: remove this
+          "build": magellanBuildId,
+          "public": visibility
+        };
+
+        logger.debug("Data posting to SauceLabs job:");
+        logger.debug(JSON.stringify(data));
+        logger.debug(`Updating saucelabs ${requestPath}`);
+
+        const requestOptions = {
+          url: `https://saucelabs.com${requestPath}`,
+          method: "PUT",
+          auth: {
+            user: config.tunnel.username,
+            pass: config.tunnel.accessKey
+          },
+          body: data,
+          json: true
+        };
+
+        if (settings.config.sauceOutboundProxy) {
+          requestOptions.proxy = settings.config.sauceOutboundProxy;
+          requestOptions.strictSSL = false;
+        }
+
+        request(requestOptions, (error, res, json) => {
+          if (error) {
+            logger.err("Error when posting update to Saucelabs session with request:");
+            logger.err(error);
+            return callback();
+          }
+
+          logger.debug("Response from Saucelabs session update:");
+          logger.debug(JSON.stringify(json));
+          return callback(additionalLog);
+        });
+      });
     } catch (err) {
       logger.err(`Error ${err}`);
       return callback();
