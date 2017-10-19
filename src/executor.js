@@ -139,9 +139,7 @@ const Executor = {
         // print out sauce replay to console if test failed
         additionalLog = logger.stringifyWarn(`Saucelabs replay can be found at https://saucelabs.com/tests/${sessionId}\n`);
       }
-
-      // retrieve account visibility from saucelabs
-      request({
+      const infoRequestOption = {
         url: `https://saucelabs.com/rest/v1/users/${config.tunnel.username}`,
         method: "GET",
         auth: {
@@ -150,7 +148,15 @@ const Executor = {
         },
         body: {},
         json: true
-      }, (verror, vres, vjson) => {
+      };
+
+      if (settings.config.sauceOutboundProxy) {
+        infoRequestOption.proxy = settings.config.sauceOutboundProxy;
+        infoRequestOption.strictSSL = false;
+      }
+
+      // retrieve account visibility from saucelabs
+      request(infoRequestOption, (verror, vres, vjson) => {
         if (verror) {
           logger.err(`Error when getting saucelabs account detail for ${config.tunnel.username}:`);
           logger.err(verror);
