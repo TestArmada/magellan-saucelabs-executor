@@ -2,7 +2,7 @@ import argvs from "yargs";
 import path from "path";
 
 const debug = argvs.argv.debug;
-const TEMP_DIR = path.resolve(argvs.temp_dir || "./temp");
+const TEMP_DIR = path.resolve(argvs.argv.temp_dir || "./temp");
 
 /*eslint-disable no-magic-numbers*/
 const config = {
