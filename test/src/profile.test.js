@@ -103,7 +103,7 @@ describe("Profile", () => {
         .getProfiles({}, argvMock)
         .then((profile) => {
           expect(profile.desiredCapabilities.browserName).to.equal("chrome");
-          expect(profile.desiredCapabilities.version).to.equal("61");
+          expect(profile.desiredCapabilities.version).to.equal("66");
           expect(profile.desiredCapabilities.platform).to.equal("Windows 10");
           expect(profile.desiredCapabilities.appiumVersion).to.equal("1.6.6");
           expect(profile.desiredCapabilities.automationName).to.equal("XCUITest");
@@ -150,7 +150,7 @@ describe("Profile", () => {
         .then((profiles) => {
           expect(profiles.length).to.equal(2);
           expect(profiles[0].desiredCapabilities.browserName).to.equal("chrome");
-          expect(profiles[0].desiredCapabilities.version).to.equal("61");
+          expect(profiles[0].desiredCapabilities.version).to.equal("66");
           expect(profiles[0].desiredCapabilities.platform).to.equal("Windows 10");
           expect(profiles[0].desiredCapabilities.appiumVersion).to.equal("1.6.6");
           expect(profiles[0].desiredCapabilities.automationName).to.equal("XCUITest");
@@ -194,7 +194,7 @@ describe("Profile", () => {
   describe("getCapabilities", () => {
     it("desktop web", () => {
       let p = {
-        "browser": "microsoftedge_14_Windows_10_Desktop",
+        "browser": "MicrosoftEdge_14_Windows_10_Desktop",
         "resolution": "1280x1024",
         "executor": "sauce"
       };
@@ -202,18 +202,18 @@ describe("Profile", () => {
       return profile
         .getCapabilities(p)
         .then((result) => {
-          expect(result.desiredCapabilities.browserName).to.equal("microsoftedge");
+          expect(result.desiredCapabilities.browserName).to.equal("MicrosoftEdge");
           expect(result.desiredCapabilities.version).to.equal("14");
           expect(result.desiredCapabilities.platform).to.equal("Windows 10");
           expect(result.executor).to.equal("sauce");
           expect(result.nightwatchEnv).to.equal("sauce");
-          expect(result.id).to.equal("microsoftedge_14_Windows_10_Desktop");
+          expect(result.id).to.equal("MicrosoftEdge_14_Windows_10_Desktop");
         });
     });
 
     it("mobile device", () => {
       let p = {
-        "browser": "iphone_9_2_iOS_iPhone_Simulator",
+        "browser": "iphone_10_2_iOS_iPhone_Simulator",
         "orientation": "portrait",
         "executor": "sauce"
       };
@@ -222,13 +222,13 @@ describe("Profile", () => {
         .getCapabilities(p)
         .then((result) => {
           expect(result.desiredCapabilities.browserName).to.equal("iphone");
-          expect(result.desiredCapabilities.version).to.equal("9.2");
+          expect(result.desiredCapabilities.version).to.equal("10.2");
           expect(result.desiredCapabilities.platform).to.equal("iOS");
           expect(result.desiredCapabilities.deviceName).to.equal("iPhone Simulator");
           expect(result.desiredCapabilities.deviceOrientation).to.equal("portrait");
           expect(result.executor).to.equal("sauce");
           expect(result.nightwatchEnv).to.equal("sauce");
-          expect(result.id).to.equal("iphone_9_2_iOS_iPhone_Simulator");
+          expect(result.id).to.equal("iphone_10_2_iOS_iPhone_Simulator");
         });
     });
 

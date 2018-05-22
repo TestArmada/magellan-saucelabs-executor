@@ -22,12 +22,7 @@ const config = {
   sauceOutboundProxy: null,
 
   app: null,
-  appCapabilitiesConfig: null,
-
-  locksServerLocation: null,
-  locksOutageTimeout: 1000 * 60 * 5,
-  locksPollingInterval: 5000,
-  locksRequestTimeout: 5000
+  appCapabilitiesConfig: null
 };
 
 

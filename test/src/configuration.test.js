@@ -30,11 +30,6 @@ describe("Configuration", () => {
 
     expect(config.sharedSauceParentAccount).to.equal(null);
     expect(config.useTunnels).to.equal(false);
-
-    expect(config.locksServerLocation).to.equal(null);
-    expect(config.locksOutageTimeout).to.equal(1000 * 60 * 5);
-    expect(config.locksPollingInterval).to.equal(5000);
-    expect(config.locksRequestTimeout).to.equal(5000);
   });
 
   describe("validateConfig", () => {
@@ -51,11 +46,6 @@ describe("Configuration", () => {
 
       expect(config.sharedSauceParentAccount).to.equal(null);
       expect(config.useTunnels).to.equal(false);
-
-      expect(config.locksServerLocation).to.equal(undefined);
-      expect(config.locksOutageTimeout).to.equal(1000 * 60 * 5);
-      expect(config.locksPollingInterval).to.equal(5000);
-      expect(config.locksRequestTimeout).to.equal(5000);
     });
 
     describe("executor enabled", () => {
@@ -74,7 +64,6 @@ describe("Configuration", () => {
           SAUCE_USERNAME: "FAKE_USERNAME",
           SAUCE_ACCESS_KEY: "FAKE_ACCESSKEY",
           SAUCE_CONNECT_VERSION: "FAKE_VERSION",
-          LOCKS_SERVER: "FAKE_LOCKSERVER/",
           SAUCE_TUNNEL_CLOSE_TIMEOUT: 400,
           SAUCE_TUNNEL_FAST_FAIL_REGEXPS: "a,b,c",
           SAUCE_OUTBOUND_PROXY: "FAKE_PROXY"
@@ -91,11 +80,6 @@ describe("Configuration", () => {
         expect(config.sharedSauceParentAccount).to.equal(null);
         expect(config.useTunnels).to.equal(true);
         expect(config.sauceOutboundProxy).to.equal("FAKE_PROXY");
-
-        expect(config.locksServerLocation).to.equal("FAKE_LOCKSERVER");
-        expect(config.locksOutageTimeout).to.equal(1000 * 60 * 5);
-        expect(config.locksPollingInterval).to.equal(5000);
-        expect(config.locksRequestTimeout).to.equal(5000);
       });
 
       it("succeed with isEnabled", () => {
@@ -108,7 +92,6 @@ describe("Configuration", () => {
           SAUCE_USERNAME: "FAKE_USERNAME",
           SAUCE_ACCESS_KEY: "FAKE_ACCESSKEY",
           SAUCE_CONNECT_VERSION: "FAKE_VERSION",
-          LOCKS_SERVER: "FAKE_LOCKSERVER/",
           SAUCE_TUNNEL_CLOSE_TIMEOUT: 400,
           SAUCE_TUNNEL_FAST_FAIL_REGEXPS: "a,b,c"
         };
@@ -123,11 +106,6 @@ describe("Configuration", () => {
 
         expect(config.sharedSauceParentAccount).to.equal(null);
         expect(config.useTunnels).to.equal(true);
-
-        expect(config.locksServerLocation).to.equal("FAKE_LOCKSERVER");
-        expect(config.locksOutageTimeout).to.equal(1000 * 60 * 5);
-        expect(config.locksPollingInterval).to.equal(5000);
-        expect(config.locksRequestTimeout).to.equal(5000);
       });
 
       it("missing SAUCE_USERNAME", () => {

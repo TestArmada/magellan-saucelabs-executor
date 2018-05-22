@@ -1,6 +1,6 @@
 {
   "name": "testarmada-magellan-saucelabs-executor",
-  "version": "4.11.2",
+  "version": "5.0.0",
   "description": "test executor for magellan test to run over saucelabs cloud",
   "main": "index.js",
   "scripts": {
@@ -37,7 +37,6 @@
     "lodash": "^4.17.4",
     "request": "^2.81.0",
     "sauce-connect-launcher": "^1.2.0",
-    "ws": "^2.2.3",
     "yargs": "^6.6.0"
   },
   "devDependencies": {

@@ -41,13 +41,6 @@ describe("Executor", () => {
 
     beforeEach(() => {
       mocks = {
-        Locks: class Locks {
-          constructor(config) { }
-          acquire(callback) { callback() }
-          release(info, callback) { callback() }
-          initialize() { return new Promise((resolve) => resolve()) }
-          teardown() { }
-        },
 
         Tunnel: class Tunnel {
           constructor(config) { }
@@ -140,13 +133,6 @@ describe("Executor", () => {
   describe("teardownRunner", () => {
     it("no create tunnel", () => {
       let mocks = {
-        Locks: class Locks {
-          constructor(config) { }
-          acquire(callback) { callback(1) }
-          release(info, callback) { callback(2) }
-          initialize() { return new Promise((resolve) => resolve()) }
-          teardown() { }
-        },
 
         Tunnel: class Tunnel {
           constructor(config) { }
@@ -165,14 +151,7 @@ describe("Executor", () => {
 
     it("use tunnel", () => {
       let mocks = {
-        Locks: class Locks {
-          constructor(config) { }
-          acquire(callback) { callback(1) }
-          release(info, callback) { callback(2) }
-          initialize() { return new Promise((resolve) => resolve()) }
-          teardown() { }
-        },
-
+        
         Tunnel: class Tunnel {
           constructor(config) { }
           initialize() { return new Promise((resolve) => resolve()) }
@@ -197,14 +176,7 @@ describe("Executor", () => {
 
   it("setupTest", () => {
     let mocks = {
-      Locks: class Locks {
-        constructor(config) { }
-        acquire(callback) { callback(1) }
-        release(info, callback) { callback(2) }
-        initialize() { return new Promise((resolve) => resolve()) }
-        teardown() { }
-      },
-
+      
       Tunnel: class Tunnel {
         constructor(config) { }
         initialize() { return new Promise((resolve) => resolve()) }
@@ -217,21 +189,13 @@ describe("Executor", () => {
     return executor
       .setupRunner(mocks)
       .then(() => {
-        executor.setupTest((num) => {
-          expect(num).to.equal(1);
+        executor.setupTest(() => {
         });
       });
   });
 
   it("teardownTest", () => {
     let mocks = {
-      Locks: class Locks {
-        constructor(config) { }
-        acquire(callback) { callback(1) }
-        release(info) { }
-        initialize() { return new Promise((resolve) => resolve()) }
-        teardown() { }
-      },
 
       Tunnel: class Tunnel {
         constructor(config) { }

@@ -6,21 +6,18 @@
 
 Executor for [Magellan](https://github.com/TestArmada/magellan) to run [nightwatchjs](http://nightwatchjs.org/) tests in [Saucelabs](https://saucelabs.com/) environment.
 
+*Pleast Note:* in version 5 release `locks` integration is removed from executor and moved into `magellan` repo. Magellan@11 release manages `locks` and other test resources via resource strategy. 
+
 # Important Notes About Versions
 
 ## Magellan Version Compatibility
 
 Important: `testarmada-magellan-saucelabs-executor` is only supported by magellan version `10.0.0` or higher.
 
-## Locks Version Compatibility
-
-If you are running a version of `testarmada-magellan-saucelabs-executor` version `4.x.x` or higher and also use [Locks](https://github.com/TestArmada/locks) to traffic control your Saucelabs VM allocation, then you should run a minimum of `locks@3.x.x`. Earlier versions of Locks do not expose a websocket, which is what executor `4.x.x` or higher expects.
-
 ## What does this executor do
 
  1. It manages [Sauce Connect](https://wiki.saucelabs.com/display/DOCS/Sauce+Connect+Proxy) if your tests need it.
  2. It talks [Guacamole](https://github.com/TestArmada/guacamole) so that the desiredCapabilities shrinks down to a string, which makes managing your browser selection easier.
- 3. It collaborates with [Locks](https://github.com/TestArmada/locks) to schedule the VM acquisition traffic intelligently, preventing a rise in errors when your Sauce capacity is saturated.
  4. It reports test result to Saucelabs automatically.
  5. It runs tests by forking the test framework (i.e. Nightwatch, etc) it as `magellan` child process.
 
@@ -57,26 +54,6 @@ Please follow the following steps:
  ```
 
 Congratulations, you're all set. 
-
-
-## Configuring `locks` support
-
-`testarmada-magellan-saucelabs-executor` is able to communicate with a [Locks](https://github.com/TestArmada/locks) instance for Saucelabs traffic control.
-
-To configure `locks`, set the `LOCKS_SERVER` environment variable as follows:
-
-```
-export LOCKS_SERVER=http://yourlockshost:4765/
-
-### Proxy Configuration
-
-**NOTE:** At this time, proxy configuration for outbound control messages to Saucelabs is only supported for Nightwatch.js consumers. Please consider a filing pull request if you are familiar with how other frameworks configure outbound proxy access!
-
-To use a proxy to reach Saucelabs when querying the Saucelabs API, set an environment variable called `SAUCE_OUTBOUND_PROXY` before running Magellan with this executor:
-
-```console
-$ export SAUCE_OUTBOUND_PROXY=http://your-internal-proxy-host:8080
-```
 
 ## Customize sauce tunnel flags
 

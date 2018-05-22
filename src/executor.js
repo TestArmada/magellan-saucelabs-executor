@@ -1,32 +1,19 @@
 import { fork } from "child_process";
-import Locks from "./locks";
 import Tunnel from "./tunnel";
 import logger from "./logger";
 import settings from "./settings";
 import analytics from "./global_analytics";
 import request from "request";
+import { callbackify } from "util";
 
 let config = settings.config;
 
 let tunnel = null;
-let locks = null;
 
 const Executor = {
   setupRunner: (mocks = null) => {
-
-    let ILocks = Locks;
-
-    if (mocks && mocks.Locks) {
-      ILocks = mocks.Locks;
-    }
-
-    locks = new ILocks(config);
-
     return Executor
-      .setupTunnels(mocks)
-      .then(() => {
-        return locks.initialize();
-      });
+      .setupTunnels(mocks);
   },
 
   setupTunnels: (mocks = null) => {
@@ -83,9 +70,6 @@ const Executor = {
       config = mocks.config;
     }
 
-    // shut down locks
-    locks.teardown();
-
     // close tunnel if needed
     if (tunnel && config.useTunnels) {
       return tunnel
@@ -94,19 +78,16 @@ const Executor = {
           logger.log("Sauce tunnel is closed!  Continuing...");
         });
     } else {
-      return new Promise((resolve) => {
-        resolve();
-      });
+      return Promise.resolve();
     }
   },
 
   setupTest: (callback) => {
-    locks.acquire(callback);
+    return callback();
   },
 
   teardownTest: (info, callback) => {
-    locks.release(info);
-    callback(info);
+    return callback(info);
   },
 
   execute: (testRun, options, mocks = null) => {

@@ -92,19 +92,6 @@ export default {
       settings.config.useTunnels = !!runArgv.sauce_create_tunnels;
     }
 
-    // locks config
-    settings.config.locksServerLocation = env.LOCKS_SERVER;
-
-    // Remove trailing / in locks server location if it's present.
-    if (typeof settings.config.locksServerLocation === "string"
-      && settings.config.locksServerLocation.length > 0) {
-      if (settings.config.locksServerLocation.charAt(
-        settings.config.locksServerLocation.length - 1) === "/") {
-        settings.config.locksServerLocation = settings.config.locksServerLocation.substr(0,
-          settings.config.locksServerLocation.length - 1);
-      }
-    }
-
     const parameterWarnings = {
       username: {
         required: true,
