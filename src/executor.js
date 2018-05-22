@@ -4,7 +4,6 @@ import logger from "./logger";
 import settings from "./settings";
 import analytics from "./global_analytics";
 import request from "request";
-import { callbackify } from "util";
 
 let config = settings.config;
 
