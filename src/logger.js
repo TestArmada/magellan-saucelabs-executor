@@ -11,7 +11,6 @@ module.exports = {
   output: console,
 
   debug(msg) {
-    console.log(debug);
     if (debug) {
       const deb = clc.blueBright("[DEBUG]");
       this.output.log(util.format("%s [%s] %s", deb, PREFIX, msg));
