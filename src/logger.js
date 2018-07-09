@@ -1,16 +1,17 @@
 
 
-import { argv } from "yargs";
-import util from "util";
-import clc from "cli-color";
+const argv = require("yargs").argv;
+const util = require("util");
+const clc = require("cli-color");
 
 const debug = argv.debug;
 const PREFIX = "Saucelabs Executor";
 
-export default {
+module.exports = {
   output: console,
 
   debug(msg) {
+    console.log(debug);
     if (debug) {
       const deb = clc.blueBright("[DEBUG]");
       this.output.log(util.format("%s [%s] %s", deb, PREFIX, msg));

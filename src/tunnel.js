@@ -1,12 +1,14 @@
-import sauceConnectLauncher from "sauce-connect-launcher";
-import path from "path";
-import _ from "lodash";
-import logger from "./logger";
-import settings from "./settings";
-import analytics from "./global_analytics";
 
-export default class Tunnel {
-  constructor(options, sauceConnectLauncherMock = null) {
+
+const sauceConnectLauncher = require("sauce-connect-launcher");
+const path = require("path");
+const _ = require("lodash");
+const logger = require("./logger");
+const settings = require("./settings");
+const analytics = require("./global_analytics");
+
+module.exports = class Tunnel {
+  constructor(options, sauceConnectLauncherMock) {
     this.options = _.assign({}, options);
     this.sauceConnectLauncher = sauceConnectLauncher;
 
@@ -114,13 +116,10 @@ export default class Tunnel {
     return new Promise((resolve) => {
       if (this.tunnelInfo) {
         logger.log(`Closing sauce tunnel [${this.options.tunnel.tunnelIdentifier}]`);
-        this.tunnelInfo.process.close(() => {
-          resolve();
-        });
-      } else {
-        resolve();
+        return this.tunnelInfo.process.close(() => resolve());
       }
+      return resolve();
     });
 
   }
-}
+};

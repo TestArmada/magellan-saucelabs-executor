@@ -1,21 +1,23 @@
-import { fork } from "child_process";
-import Tunnel from "./tunnel";
-import logger from "./logger";
-import settings from "./settings";
-import analytics from "./global_analytics";
-import request from "request";
+
+
+const fork = require("child_process").fork;
+const request = require("request");
+const Tunnel = require("./tunnel");
+const logger = require("./logger");
+const settings = require("./settings");
+const analytics = require("./global_analytics");
 
 let config = settings.config;
 
 let tunnel = null;
 
 const Executor = {
-  setupRunner: (mocks = null) => {
+  setupRunner: (mocks) => {
     return Executor
       .setupTunnels(mocks);
   },
 
-  setupTunnels: (mocks = null) => {
+  setupTunnels: (mocks) => {
     let ITunnel = Tunnel;
 
     if (mocks) {
@@ -64,7 +66,7 @@ const Executor = {
     }
   },
 
-  teardownRunner: (mocks = null) => {
+  teardownRunner: (mocks) => {
     if (mocks && mocks.config) {
       config = mocks.config;
     }
@@ -89,7 +91,7 @@ const Executor = {
     return callback(info);
   },
 
-  execute: (testRun, options, mocks = null) => {
+  execute: (testRun, options, mocks) => {
     let ifork = fork;
 
     if (mocks && mocks.fork) {

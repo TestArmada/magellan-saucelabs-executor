@@ -1,4 +1,0 @@
-reporting:
-    reports:
-        - lcov
-    dir: ./lib/coverage
