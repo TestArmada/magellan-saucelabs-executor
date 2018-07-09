@@ -1,26 +1,21 @@
-import executor from "../../lib/executor";
-import chai from "chai";
-import chaiAsPromise from "chai-as-promised";
-import _ from "lodash";
-import settings from "../../lib/settings";
+"use strict";
 
-import logger from "../../lib/logger";
+const executor = require("../src/executor");
 
-// eat console logs
-// logger.output = {
-//   log() { },
-//   error() { },
-//   debug() { },
-//   warn() { }
-// };
+jest.mock("request", () => {
+  return (opts, cb) => cb(null, {}, { is_public: false });
+});
 
-chai.use(chaiAsPromise);
-
-const expect = chai.expect;
-const assert = chai.assert;
+jest.mock("../src/settings", () => {
+  return {
+    config: {
+      sauceOutboundProxy: "FAKE_OUTBOUND_PROXY"
+    }
+  }
+});
 
 describe("Executor", () => {
-  it("execute", () => {
+  test("execute", () => {
     const mocks = {
       fork(cmd, args, opts) {
         return 1;
@@ -33,7 +28,7 @@ describe("Executor", () => {
     };
 
     let r = executor.execute(testRun, {}, mocks);
-    expect(r).to.equal(1);
+    expect(r).toBe(1);
   });
 
   describe("setupRunner", () => {
@@ -41,13 +36,6 @@ describe("Executor", () => {
 
     beforeEach(() => {
       mocks = {
-        Locks: class Locks {
-          constructor(config) { }
-          acquire(callback) { callback() }
-          release(info, callback) { callback() }
-          initialize() { return new Promise((resolve) => resolve()) }
-          teardown() { }
-        },
 
         Tunnel: class Tunnel {
           constructor(config) { }
@@ -59,7 +47,7 @@ describe("Executor", () => {
       };
     });
 
-    it("no create tunnel", () => {
+    test("no create tunnel", () => {
       mocks.config = {
         tunnel: {
           useTunnels: false
@@ -74,7 +62,7 @@ describe("Executor", () => {
         });
     });
 
-    it("use existing tunnel", () => {
+    test("use existing tunnel", () => {
       mocks.config = {
         tunnel: {
           useTunnels: false,
@@ -89,7 +77,7 @@ describe("Executor", () => {
         .catch(err => assert(false, "executor setupRunner isn't successful for use existing tunnel config"));
     });
 
-    it("create new tunnel", () => {
+    test("create new tunnel", () => {
       mocks.config = {
         tunnel: {
           useTunnels: true,
@@ -102,7 +90,7 @@ describe("Executor", () => {
         .catch(err => assert(false, "executor setupRunner isn't successful for create new tunnel config"));
     });
 
-    it("create new tunnel failed in initialization", () => {
+    test("create new tunnel failed in initialization", () => {
       mocks.config = {
         useTunnels: true
       };
@@ -116,10 +104,10 @@ describe("Executor", () => {
       return executor
         .setupRunner(mocks)
         .then(() => assert(false, "executor setupRunner isn't successful"))
-        .catch(err => expect(err).to.equal("initialization error"));
+        .catch(err => expect(err).toBe("initialization error"));
     });
 
-    it("create new tunnel failed in open", () => {
+    test("create new tunnel failed in open", () => {
       mocks.config = {
         useTunnels: true
       };
@@ -133,20 +121,13 @@ describe("Executor", () => {
       return executor
         .setupRunner(mocks)
         .then(() => assert(false, "executor setupRunner isn't successful"))
-        .catch(err => expect(err).to.equal("open error"));
+        .catch(err => expect(err).toBe("open error"));
     });
   });
 
   describe("teardownRunner", () => {
-    it("no create tunnel", () => {
+    test("no create tunnel", () => {
       let mocks = {
-        Locks: class Locks {
-          constructor(config) { }
-          acquire(callback) { callback(1) }
-          release(info, callback) { callback(2) }
-          initialize() { return new Promise((resolve) => resolve()) }
-          teardown() { }
-        },
 
         Tunnel: class Tunnel {
           constructor(config) { }
@@ -163,15 +144,8 @@ describe("Executor", () => {
         .catch(err => assert(false, "executor teardownRunner isn't successful for no create tunnel config"));
     });
 
-    it("use tunnel", () => {
+    test("use tunnel", () => {
       let mocks = {
-        Locks: class Locks {
-          constructor(config) { }
-          acquire(callback) { callback(1) }
-          release(info, callback) { callback(2) }
-          initialize() { return new Promise((resolve) => resolve()) }
-          teardown() { }
-        },
 
         Tunnel: class Tunnel {
           constructor(config) { }
@@ -195,15 +169,8 @@ describe("Executor", () => {
     });
   });
 
-  it("setupTest", () => {
+  test("setupTest", () => {
     let mocks = {
-      Locks: class Locks {
-        constructor(config) { }
-        acquire(callback) { callback(1) }
-        release(info, callback) { callback(2) }
-        initialize() { return new Promise((resolve) => resolve()) }
-        teardown() { }
-      },
 
       Tunnel: class Tunnel {
         constructor(config) { }
@@ -217,21 +184,13 @@ describe("Executor", () => {
     return executor
       .setupRunner(mocks)
       .then(() => {
-        executor.setupTest((num) => {
-          expect(num).to.equal(1);
+        executor.setupTest(() => {
         });
       });
   });
 
-  it("teardownTest", () => {
+  test("teardownTest", () => {
     let mocks = {
-      Locks: class Locks {
-        constructor(config) { }
-        acquire(callback) { callback(1) }
-        release(info) { }
-        initialize() { return new Promise((resolve) => resolve()) }
-        teardown() { }
-      },
 
       Tunnel: class Tunnel {
         constructor(config) { }
@@ -246,8 +205,26 @@ describe("Executor", () => {
       .setupRunner(mocks)
       .then(() => {
         executor.teardownTest("FAKE_TOKEN", (info) => {
-          expect(info).to.equal("FAKE_TOKEN");
+          expect(info).toBe("FAKE_TOKEN");
         });
       });
+  });
+
+  describe("summerizeTest", () => {
+    test("no meta data in testResult", (done) => {
+      executor.summerizeTest("FAKE_ID", {}, () => {
+        done();
+      });
+    });
+
+    test("successfully reported", (done) => {
+      executor.summerizeTest("FAKE_ID", {
+        metadata: {
+          sessionId: "FAKE_SESSION_ID"
+        }
+      }, () => {
+        done();
+      });
+    });
   });
 });

@@ -1,7 +1,9 @@
-const executor = require("./lib/executor");
-const configuration = require("./lib/configuration").default;
-const profile = require("./lib/profile").default;
-const help = require("./lib/help").default;
+"use strict";
+
+const executor = require("./src/executor");
+const configuration = require("./src/configuration");
+const profile = require("./src/profile");
+const help = require("./src/help");
 
 module.exports = {
   name: "testarmada-magellan-sauce-executor",

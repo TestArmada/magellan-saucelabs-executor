@@ -1,8 +1,10 @@
-import argvs from "yargs";
-import path from "path";
 
-const debug = argvs.argv.debug;
-const TEMP_DIR = path.resolve(argvs.argv.temp_dir || "./temp");
+
+const argv = require("yargs").argv;
+const path = require("path");
+
+const debug = argv.debug;
+const TEMP_DIR = path.resolve(argv.temp_dir || "./temp");
 
 /*eslint-disable no-magic-numbers*/
 const config = {
@@ -22,16 +24,11 @@ const config = {
   sauceOutboundProxy: null,
 
   app: null,
-  appCapabilitiesConfig: null,
-
-  locksServerLocation: null,
-  locksOutageTimeout: 1000 * 60 * 5,
-  locksPollingInterval: 5000,
-  locksRequestTimeout: 5000
+  appCapabilitiesConfig: null
 };
 
 
-export default {
+module.exports = {
   debug,
   tempDir: TEMP_DIR,
   config,

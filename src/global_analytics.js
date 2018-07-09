@@ -1,10 +1,12 @@
-import _ from "lodash";
-import { EventEmitter } from "events";
+
+
+const _ = require("lodash");
+const EventEmitter = require("events").EventEmitter;
 
 const timeline = [];
 const _emitter = new EventEmitter();
 
-export default {
+module.exports = {
   // Push a global (i.e. not testrun related) analytics event to the timeline.
   // This will cause any reporters that listen to global analytics events to
   // receive the event. A markers list will be started with the current time.

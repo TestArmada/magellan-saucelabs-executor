@@ -1,9 +1,11 @@
-import { argv } from "yargs";
-import _ from "lodash";
-import path from "path";
-import logger from "./logger";
-import settings from "./settings";
-import guid from "./util/guid";
+
+
+const argv = require("yargs").argv;
+const _ = require("lodash");
+const path = require("path");
+const logger = require("./logger");
+const settings = require("./settings");
+const guid = require("./util/guid");
 
 const _loadConfig = (filename) => {
   const filepath = path.resolve(process.cwd() + path.sep + filename);
@@ -21,13 +23,13 @@ const _loadConfig = (filename) => {
   }
 };
 
-export default {
+module.exports = {
   getConfig: () => {
     return settings.config;
   },
 
   /*eslint-disable complexity*/
-  validateConfig: (opts, argvMock = null, envMock = null) => {
+  validateConfig: (opts, argvMock, envMock) => {
     let runArgv = argv;
     let env = process.env;
 
@@ -90,19 +92,6 @@ export default {
 
     if (runArgv.sauce_create_tunnels) {
       settings.config.useTunnels = !!runArgv.sauce_create_tunnels;
-    }
-
-    // locks config
-    settings.config.locksServerLocation = env.LOCKS_SERVER;
-
-    // Remove trailing / in locks server location if it's present.
-    if (typeof settings.config.locksServerLocation === "string"
-      && settings.config.locksServerLocation.length > 0) {
-      if (settings.config.locksServerLocation.charAt(
-        settings.config.locksServerLocation.length - 1) === "/") {
-        settings.config.locksServerLocation = settings.config.locksServerLocation.substr(0,
-          settings.config.locksServerLocation.length - 1);
-      }
     }
 
     const parameterWarnings = {

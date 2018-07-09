@@ -1,22 +1,7 @@
-import Tunnel from "../../lib/tunnel";
-import chai from "chai";
-import chaiAsPromise from "chai-as-promised";
-import _ from "lodash";
+"use strict";
 
-import logger from "../../lib/logger";
-
-// eat console logs
-// logger.output = {
-//   log() { },
-//   error() { },
-//   debug() { },
-//   warn() { }
-// };
-
-chai.use(chaiAsPromise);
-
-const expect = chai.expect;
-const assert = chai.assert;
+const Tunnel = require("../src/tunnel");
+const _ = require("lodash");
 
 describe("Tunnel", () => {
   let tunnel;
@@ -40,61 +25,57 @@ describe("Tunnel", () => {
     tunnel = new Tunnel(options, sauceConnectLauncherMock);
   });
 
-  it("constructor", () => {
-    expect(tunnel.options.tunnel.username).to.equal("FAKE_USERNAME");
-    expect(tunnel.options.tunnel.accessKey).to.equal("FAKE_ACCESSKEY");
-    expect(tunnel.options.tunnel.tunnelIdentifier).to.equal("FAKE_TUNNELID");
-    expect(tunnel.options.tunnel.fastFailRegexps).to.equal("FAKE_EXP");
+  test("constructor", () => {
+    expect(tunnel.options.tunnel.username).toBe("FAKE_USERNAME");
+    expect(tunnel.options.tunnel.accessKey).toBe("FAKE_ACCESSKEY");
+    expect(tunnel.options.tunnel.tunnelIdentifier).toBe("FAKE_TUNNELID");
+    expect(tunnel.options.tunnel.fastFailRegexps).toBe("FAKE_EXP");
   });
 
   describe("initialize", () => {
-    it("successful", () => {
+    test("successful", () => {
       return tunnel
         .initialize()
         .catch(err => assert(false, "tunnel isn't initialized correctly." + err));
     });
 
-    it("missing username", () => {
+    test("missing username", () => {
       tunnel = new Tunnel({ tunnel: {} }, sauceConnectLauncherMock);
 
       return tunnel
         .initialize()
         .then(() => assert(false, "tunnel username isn't processed correctly"))
         .catch(err =>
-          expect(Promise.resolve(err))
-            .to.eventually
-            .equal("Sauce tunnel support is missing configuration: Sauce username."));
+          expect(err)
+            .toBe("Sauce tunnel support is missing configuration: Sauce username."));
     });
 
-    it("missing accesskey", () => {
+    test("missing accesskey", () => {
       tunnel = new Tunnel({ tunnel: { username: "FAKE_USERNAME" } }, sauceConnectLauncherMock);
 
       return tunnel
         .initialize()
         .then(() => assert(false, "tunnel accesskey isn't processed correctly"))
         .catch(err =>
-          expect(Promise.resolve(err))
-            .to.eventually
-            .equal("Sauce tunnel support is missing configuration: Sauce access key."));
+          expect(err)
+            .toBe("Sauce tunnel support is missing configuration: Sauce access key."));
     });
 
-    it("download error", () => {
+    test("download error", () => {
       sauceConnectLauncherMock.download = (opts, callback) => { callback("FAKE_ERROR") };
 
       return tunnel
         .initialize()
         .then(() => assert(false, "tunnel download error isn't processed correctly"))
         .catch(err =>
-          expect(Promise.resolve(err))
-            .to.eventually
-            .equal("FAKE_ERROR"));
+          expect(err)
+            .toBe("FAKE_ERROR"));
     });
   });
 
   describe("open", function () {
-    this.timeout(60000);
 
-    it("straight succeed", () => {
+    test("straight succeed", () => {
       sauceConnectLauncherMock = (opts, callback) => {
         callback(null, "FAKE_TUNNEL_PROCESS");
       };
@@ -103,12 +84,12 @@ describe("Tunnel", () => {
 
       return tunnel
         .open()
-        .then(() => expect(Promise.resolve(tunnel.tunnelInfo.process))
-          .to.eventually.equal("FAKE_TUNNEL_PROCESS"))
+        .then(() => expect(tunnel.tunnelInfo.process)
+          .toBe("FAKE_TUNNEL_PROCESS"))
         .catch(err => assert(false, "tunnel isn't open correctly." + err));
     });
 
-    it("cannot start sauce connect", () => {
+    test("cannot start sauce connect", () => {
       sauceConnectLauncherMock = (opts, callback) => {
         callback(new Error("Could not start Sauce Connect"));
       };
@@ -118,11 +99,11 @@ describe("Tunnel", () => {
       return tunnel
         .open()
         .then(() => assert(false, "tunnel isn't launch correctly." + err))
-        .catch(err => expect(Promise.resolve(err))
-          .to.eventually.equal("Could not start Sauce Connect"));
+        .catch(err => expect(err)
+          .toBe("Could not start Sauce Connect"));
     });
 
-    it("retry 10 times", () => {
+    test("retry 10 times", () => {
       sauceConnectLauncherMock = (opts, callback) => {
         callback(new Error("FAIL_ON_PURPOSE"));
       };
@@ -132,22 +113,22 @@ describe("Tunnel", () => {
       return tunnel
         .open()
         .then(() => assert(false, "tunnel isn't launch correctly." + err))
-        .catch(err => expect(Promise.resolve(err.message))
-          .to.eventually.equal("Failed to create a secure sauce tunnel after 10 attempts."));
+        .catch(err => expect(err.message)
+          .toBe("Failed to create a secure sauce tunnel after 10 attempts."));
     });
   });
 
   describe("close", () => {
-    it("tunnel is already closed", () => {
+    test("tunnel is already closed", () => {
       return tunnel
         .close()
         .catch(err => assert(false, "tunnel isn't close correctly." + err));
     });
 
-    it("tunnel isn't closed", () => {
+    test("tunnel isn't closed", () => {
       tunnel.tunnelInfo = {
         process: {
-          close(callback) { callback() }
+          close: (callback) => callback()
         }
       };
 

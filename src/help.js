@@ -1,4 +1,6 @@
-export default {
+
+
+module.exports = {
   "sauce_browser": {
     "visible": true,
     "type": "string",
@@ -45,7 +47,7 @@ export default {
     "type": "string",
     "example": "testsauceaccount",
     "description": "Specify parent account name if existing shared secure tunnel is "
-    + " in use (exclusive with --sauce_create_tunnels)"
+      + " in use (exclusive with --sauce_create_tunnels)"
   },
   "sauce_tunnel_config": {
     "visible": true,

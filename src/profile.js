@@ -1,10 +1,12 @@
-import _ from "lodash";
-import path from "path";
-import SauceBrowsers from "guacamole";
-import listSauceCliBrowsers from "guacamole/src/cli_list";
-import { argv } from "yargs";
-import logger from "./logger";
-import settings from "./settings";
+
+
+const _ = require("lodash");
+const path = require("path");
+const SauceBrowsers = require("guacamole");
+const listSauceCliBrowsers = require("guacamole/src/cli_list");
+const argv = require("yargs").argv;
+const logger = require("./logger");
+const settings = require("./settings");
 
 const FIREFOX_MARIONETTE = 48;
 
@@ -65,7 +67,7 @@ const _mergeLocalAppiumCapabilities = (appCapabilitiesConfig, browser, capabilit
   return capabilities;
 };
 
-export default {
+module.exports = {
   getNightwatchConfig: (profile, sauceSettings) => {
     const capabilities = _.assign({}, profile.desiredCapabilities);
 
@@ -99,7 +101,7 @@ export default {
     return config;
   },
 
-  getProfiles: (opts, argvMock = null) => {
+  getProfiles: (opts, argvMock) => {
     let runArgv = argv;
 
     if (argvMock) {
