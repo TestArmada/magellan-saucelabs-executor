@@ -42,7 +42,7 @@ export default class Locks {
     const pollingStartTime = Date.now();
 
     const poll = () => {
-      logger.debug("Asking for VM..");
+      logger.log("Asking for VM..");
 
       try {
         return this.api.claim((error, token) => {
@@ -69,7 +69,7 @@ export default class Locks {
           if (token) {
             return callback(null, { token });
           } else {
-            logger.debug("Capacity saturated, waiting for clearance to claim next available VM..");
+            logger.log("Capacity saturated, waiting for clearance to claim next available VM..");
             return setTimeout(poll, this.options.locksPollingInterval);
           }
 
