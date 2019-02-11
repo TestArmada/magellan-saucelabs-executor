@@ -1,7 +1,8 @@
 node_modules
-lib
+
 nohup.out
 temp
 
 .vscode
 test/lib
+
