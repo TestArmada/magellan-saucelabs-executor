@@ -22,6 +22,7 @@ describe("Tunnel", () => {
   };
 
   beforeEach(() => {
+    process.env.SC_NO_AUTODETECT = "true";
     tunnel = new Tunnel(options, sauceConnectLauncherMock);
   });
 
@@ -30,6 +31,7 @@ describe("Tunnel", () => {
     expect(tunnel.options.tunnel.accessKey).toBe("FAKE_ACCESSKEY");
     expect(tunnel.options.tunnel.tunnelIdentifier).toBe("FAKE_TUNNELID");
     expect(tunnel.options.tunnel.fastFailRegexps).toBe("FAKE_EXP");
+    expect(tunnel.options.tunnel.noAutodetect).toBe(true);
   });
 
   describe("initialize", () => {

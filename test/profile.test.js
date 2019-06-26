@@ -82,7 +82,7 @@ describe("Profile", () => {
       let settings = configuration.getConfig();
 
       settings.appCapabilitiesConfig = {
-        chrome_latest_Windows_10_Desktop: {
+        chrome_67_Windows_10_Desktop: {
           "appiumVersion": "1.6.6",
           "automationName": "XCUITest",
           "sendKeyStrategy": "setValue",
@@ -92,7 +92,7 @@ describe("Profile", () => {
         }
       };
       let argvMock = {
-        sauce_browser: "chrome_latest_Windows_10_Desktop"
+        sauce_browser: "chrome_67_Windows_10_Desktop"
       };
 
       return profile
@@ -109,7 +109,7 @@ describe("Profile", () => {
           expect(profile.desiredCapabilities.locationServicesEnabled).toBe("true");
           expect(profile.executor).toBe("sauce");
           expect(profile.nightwatchEnv).toBe("sauce");
-          expect(profile.id).toBe("chrome_latest_Windows_10_Desktop");
+          expect(profile.id).toBe("chrome_67_Windows_10_Desktop");
 
           delete settings.appCapabilitiesConfig;
         });
@@ -117,12 +117,12 @@ describe("Profile", () => {
 
     test("with sauce_browsers", () => {
       let argvMock = {
-        sauce_browsers: "chrome_latest_Windows_10_Desktop, safari_10_OS_X_10_11_Desktop"
+        sauce_browsers: "chrome_67_Windows_10_Desktop, safari_10_OS_X_10_11_Desktop"
       };
 
       let settings = configuration.getConfig();
       settings.appCapabilitiesConfig = {
-        chrome_latest_Windows_10_Desktop: {
+        chrome_67_Windows_10_Desktop: {
           "appiumVersion": "1.6.6",
           "automationName": "XCUITest",
           "sendKeyStrategy": "setValue",
@@ -157,7 +157,7 @@ describe("Profile", () => {
 
           expect(profiles[0].executor).toBe("sauce");
           expect(profiles[0].nightwatchEnv).toBe("sauce");
-          expect(profiles[0].id).toBe("chrome_latest_Windows_10_Desktop");
+          expect(profiles[0].id).toBe("chrome_67_Windows_10_Desktop");
           expect(profiles[1].desiredCapabilities.browserName).toBe("safari");
           expect(profiles[1].desiredCapabilities.version).toBe("10");
           expect(profiles[1].desiredCapabilities.platform).toBe("OS X 10.11");
@@ -209,7 +209,7 @@ describe("Profile", () => {
 
     test("mobile device", () => {
       let p = {
-        "browser": "iphone_10_2_iOS_iPhone_Simulator",
+        "browser": "iphone_12_2_iOS_iPhone_Simulator",
         "orientation": "portrait",
         "executor": "sauce"
       };
@@ -218,13 +218,13 @@ describe("Profile", () => {
         .getCapabilities(p)
         .then((result) => {
           expect(result.desiredCapabilities.browserName).toBe("iphone");
-          expect(result.desiredCapabilities.version).toBe("10.2");
+          expect(result.desiredCapabilities.version).toBe("12.2");
           expect(result.desiredCapabilities.platform).toBe("iOS");
           expect(result.desiredCapabilities.deviceName).toBe("iPhone Simulator");
           expect(result.desiredCapabilities.deviceOrientation).toBe("portrait");
           expect(result.executor).toBe("sauce");
           expect(result.nightwatchEnv).toBe("sauce");
-          expect(result.id).toBe("iphone_10_2_iOS_iPhone_Simulator");
+          expect(result.id).toBe("iphone_12_2_iOS_iPhone_Simulator");
         });
     });
 
