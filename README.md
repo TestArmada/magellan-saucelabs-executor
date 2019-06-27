@@ -37,6 +37,9 @@ Please follow the following steps:
  export SAUCE_CONNECT_VERSION=${VERSION}
  export SAUCE_USERNAME=${USERNAME}
  export SAUCE_ACCESS_KEY=${TOKEN}
+ 
+ # Set this to disable the autodetection of proxy settings when using sauce connect
+ export SC_NO_AUTODETECT=true
  ```
 
  4. `./node_modules/.bin/magellan --help` to see if you can see the following content printed out
