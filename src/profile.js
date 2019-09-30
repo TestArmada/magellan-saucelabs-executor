@@ -144,9 +144,9 @@ module.exports = {
 
           logger.debug(`detected profile: ${JSON.stringify(p)}`);
 
-          resolve(p);
+          return resolve(p);
         }).catch(e => {
-            reject(e);
+          return reject(e);
         });
       } else if (runArgv.sauce_browsers) {
         return SauceBrowsers.initialize().then(() => {
@@ -174,12 +174,12 @@ module.exports = {
 
           logger.debug(`detected profiles: ${JSON.stringify(returnBrowsers)}`);
 
-          resolve(returnBrowsers);
+          return resolve(returnBrowsers);
         }).catch(e => {
-            reject(e);
+          return reject(e);
         });
       } else {
-        resolve();
+        return resolve();
       }
     });
   },

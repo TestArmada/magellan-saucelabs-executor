@@ -10,7 +10,7 @@ const analytics = require("./global_analytics");
 module.exports = class Tunnel {
   constructor(options, sauceConnectLauncherMock) {
     this.options = _.assign({}, options);
-    if(process.env.SC_NO_AUTODETECT === "true") {
+    if (process.env.SC_NO_AUTODETECT === "true") {
       this.options.tunnel.noAutodetect = true;
     }
     this.sauceConnectLauncher = sauceConnectLauncher;
