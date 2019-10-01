@@ -1,3 +1,5 @@
+
+
 const _ = require("lodash");
 const path = require("path");
 const SauceBrowsers = require("guacamole");
@@ -11,19 +13,15 @@ const FIREFOX_MARIONETTE = 48;
 const _mergeCapabilities = (capabilities, capsConfig, browser) => {
   if (capsConfig && capsConfig[browser]) {
     capabilities = _.merge(capabilities, capsConfig[browser]);
-    logger.debug(
-      `DesiredCapabilities after merging appCapabilitiesConfig for browser ${browser}`
-    );
+    logger.debug(`DesiredCapabilities after merging appCapabilitiesConfig for browser ${browser}`);
     logger.debug(JSON.stringify(capabilities));
   }
   return capabilities;
 };
 
-const _patchFirefox = capabilities => {
-  if (
-    capabilities.browserName === "firefox" &&
-    parseInt(capabilities.version) >= FIREFOX_MARIONETTE
-  ) {
+const _patchFirefox = (capabilities) => {
+  if (capabilities.browserName === "firefox"
+    && parseInt(capabilities.version) >= FIREFOX_MARIONETTE) {
     capabilities.marionette = true;
     capabilities.javascriptEnabled = true;
   }
@@ -34,11 +32,7 @@ const _patchFirefox = capabilities => {
 const _patchAppium = (capabilities, browser) => {
   let tempCap = _.cloneDeep(capabilities);
   // for customized app capabilities
-  tempCap = _mergeCapabilities(
-    tempCap,
-    settings.config.appCapabilitiesConfig,
-    browser
-  );
+  tempCap = _mergeCapabilities(tempCap, settings.config.appCapabilitiesConfig, browser);
 
   // if app location is passed via command line arg
   if (settings.config.app) {
@@ -52,30 +46,19 @@ const _patchAppium = (capabilities, browser) => {
   return tempCap;
 };
 
-const _mergeLocalAppiumCapabilities = (
-  appCapabilitiesConfig,
-  browser,
-  capabilities
-) => {
+const _mergeLocalAppiumCapabilities = (appCapabilitiesConfig, browser, capabilities) => {
   // for appCapabilitiesConfig
   logger.debug(appCapabilitiesConfig);
   let appCapabilitiesConfigPath;
 
   try {
-    appCapabilitiesConfigPath = path.resolve(
-      process.cwd(),
-      appCapabilitiesConfig
-    );
+    appCapabilitiesConfigPath = path.resolve(process.cwd(), appCapabilitiesConfig);
     logger.debug(`Requiring ${appCapabilitiesConfigPath}`);
     /* eslint-disable global-require */
     const capabilitiesConfig = require(appCapabilitiesConfigPath);
     /* eslint-enable global-require */
 
-    capabilities = _mergeCapabilities(
-      capabilities,
-      capabilitiesConfig,
-      browser
-    );
+    capabilities = _mergeCapabilities(capabilities, capabilitiesConfig, browser);
   } catch (e) {
     logger.log(`Could not load ${appCapabilitiesConfigPath}.
                 Does the file exist or is it a valid JSON or JS file ?`);
@@ -124,64 +107,61 @@ module.exports = {
     if (argvMock) {
       runArgv = argvMock;
     }
-    return new Promise((resolve, reject) => {
-      if (runArgv.sauce_browser) {
-        return SauceBrowsers.initialize().then(() => {
-          const p = {
-            desiredCapabilities: _patchFirefox(
-              SauceBrowsers.get({
-                id: runArgv.sauce_browser
-              })[0]
-            ),
-            executor: "sauce",
-            nightwatchEnv: "sauce",
-            id: runArgv.sauce_browser
-          };
-          p.desiredCapabilities = _patchAppium(
-            p.desiredCapabilities,
-            runArgv.sauce_browser
-          );
 
-          logger.debug(`detected profile: ${JSON.stringify(p)}`);
-
-          return resolve(p);
-        }).catch(e => {
-          return reject(e);
-        });
-      } else if (runArgv.sauce_browsers) {
-        return SauceBrowsers.initialize().then(() => {
-          const tempBrowsers = runArgv.sauce_browsers.split(",");
-          const returnBrowsers = [];
-
-          _.forEach(tempBrowsers, browser => {
-            const b = browser.trim();
+        return new Promise((resolve, reject) => {
+          if (runArgv.sauce_browser) {
+            return SauceBrowsers
+            .initialize()
+            .then(() => {
             const p = {
-              desiredCapabilities: _patchFirefox(
-                SauceBrowsers.get({
-                  id: b
-                })[0]
-              ),
+              desiredCapabilities: _patchFirefox(SauceBrowsers.get({
+                id: runArgv.sauce_browser
+              })[0]),
               executor: "sauce",
               nightwatchEnv: "sauce",
-              // id is for magellan reporter
-              id: b
+              id: runArgv.sauce_browser
             };
+            p.desiredCapabilities = _patchAppium(p.desiredCapabilities, runArgv.sauce_browser);
 
-            p.desiredCapabilities = _patchAppium(p.desiredCapabilities, b);
+            logger.debug(`detected profile: ${JSON.stringify(p)}`);
 
-            returnBrowsers.push(p);
-          });
+            return resolve(p);
+            }).catch(e => {
+                return reject(e);
+            });
+          } else if (runArgv.sauce_browsers) {
+            const tempBrowsers = runArgv.sauce_browsers.split(",");
+            const returnBrowsers = [];
+            return SauceBrowsers
+            .initialize()
+            .then(() => {
+            _.forEach(tempBrowsers, (browser) => {
+              const b = browser.trim();
+              const p = {
+                desiredCapabilities: _patchFirefox(SauceBrowsers.get({
+                  id: b
+                })[0]),
+                executor: "sauce",
+                nightwatchEnv: "sauce",
+                // id is for magellan reporter
+                id: b
+              };
 
-          logger.debug(`detected profiles: ${JSON.stringify(returnBrowsers)}`);
+              p.desiredCapabilities = _patchAppium(p.desiredCapabilities, b);
 
-          return resolve(returnBrowsers);
+              returnBrowsers.push(p);
+            });
+
+            logger.debug(`detected profiles: ${JSON.stringify(returnBrowsers)}`);
+
+            return resolve(returnBrowsers);
         }).catch(e => {
-          return reject(e);
+            return reject(e);
         });
-      } else {
-        return resolve();
-      }
-    });
+          } else {
+            return resolve();
+          }
+        });
   },
 
   /*eslint-disable no-unused-vars*/
@@ -202,43 +182,36 @@ module.exports = {
       prof.deviceOrientation = profile.orientation;
     }
 
-    return SauceBrowsers.initialize().then(() => {
-      return new Promise((resolve, reject) => {
-        try {
-          const desiredCapabilities = _patchFirefox(SauceBrowsers.get(prof)[0]);
-          // add executor info back to capabilities
-          const p = {
-            desiredCapabilities,
-            executor: profile.executor,
-            nightwatchEnv: profile.executor,
-            id: prof.id
-          };
-          // for appium test
-          if (profile.appium) {
-            p.desiredCapabilities = _.merge(
-              p.desiredCapabilities,
-              profile.appium
-            );
+    return SauceBrowsers
+      .initialize()
+      .then(() => {
+        return new Promise((resolve, reject) => {
+          try {
+            const desiredCapabilities = _patchFirefox(SauceBrowsers.get(prof)[0]);
+            // add executor info back to capabilities
+            const p = {
+              desiredCapabilities,
+              executor: profile.executor,
+              nightwatchEnv: profile.executor,
+              id: prof.id
+            };
+            // for appium test
+            if (profile.appium) {
+              p.desiredCapabilities = _.merge(p.desiredCapabilities, profile.appium);
+            }
+            if (profile.appCapabilitiesConfig) {
+              p.desiredCapabilities = _mergeLocalAppiumCapabilities(profile.appCapabilitiesConfig,
+                profile.browser,
+                p.desiredCapabilities);
+            }
+            p.desiredCapabilities = _patchAppium(p.desiredCapabilities, profile.browser);
+            resolve(p);
+          } catch (e) {
+            reject(`Executor sauce cannot resolve profile ${
+              JSON.stringify(profile)}`);
           }
-          if (profile.appCapabilitiesConfig) {
-            p.desiredCapabilities = _mergeLocalAppiumCapabilities(
-              profile.appCapabilitiesConfig,
-              profile.browser,
-              p.desiredCapabilities
-            );
-          }
-          p.desiredCapabilities = _patchAppium(
-            p.desiredCapabilities,
-            profile.browser
-          );
-          resolve(p);
-        } catch (e) {
-          reject(
-            `Executor sauce cannot resolve profile ${JSON.stringify(profile)}`
-          );
-        }
+        });
       });
-    });
   },
 
   listBrowsers: (opts, callback, argvMock = null) => {
@@ -248,21 +221,20 @@ module.exports = {
       runArgv = argvMock;
     }
 
-    SauceBrowsers.initialize(true)
+    SauceBrowsers
+      .initialize(true)
       .then(() => {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
           if (runArgv.device_additions) {
             logger.log("Loading customized profiles");
-            SauceBrowsers.addNormalizedBrowsersFromFile(
-              runArgv.device_additions
-            );
+            SauceBrowsers.addNormalizedBrowsersFromFile(runArgv.device_additions);
           }
           resolve();
         });
       })
       .then(() => {
-        return new Promise(resolve => {
-          listSauceCliBrowsers(browserTable => {
+        return new Promise((resolve) => {
+          listSauceCliBrowsers((browserTable) => {
             // convert table heading
             browserTable.options.head[1] = "Copy-Paste Command-Line Option";
             logger.loghelp(browserTable.toString());
@@ -271,10 +243,10 @@ module.exports = {
           });
         });
       })
-      .then(browserTable => {
+      .then((browserTable) => {
         callback(null, browserTable);
       })
-      .catch(err => {
+      .catch((err) => {
         logger.err(`Couldn't fetch sauce browsers. Error: ${err}`);
         logger.err(err.stack);
         callback(err);
