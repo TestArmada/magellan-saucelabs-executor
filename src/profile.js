@@ -102,17 +102,22 @@ module.exports = {
   },
 
   getProfiles: (opts, argvMock) => {
+
     let runArgv = argv;
 
     if (argvMock) {
       runArgv = argvMock;
     }
 
-        return new Promise((resolve, reject) => {
+    if (!runArgv.sauce_browser && !runArgv.sauce_browsers) {
+        return Promise.resolve();
+    }
+
+    return SauceBrowsers
+      .initialize()
+      .then(() => {
+        return new Promise((resolve) => {
           if (runArgv.sauce_browser) {
-            return SauceBrowsers
-            .initialize()
-            .then(() => {
             const p = {
               desiredCapabilities: _patchFirefox(SauceBrowsers.get({
                 id: runArgv.sauce_browser
@@ -125,16 +130,11 @@ module.exports = {
 
             logger.debug(`detected profile: ${JSON.stringify(p)}`);
 
-            return resolve(p);
-            }).catch(e => {
-                return reject(e);
-            });
+            resolve(p);
           } else if (runArgv.sauce_browsers) {
             const tempBrowsers = runArgv.sauce_browsers.split(",");
             const returnBrowsers = [];
-            return SauceBrowsers
-            .initialize()
-            .then(() => {
+
             _.forEach(tempBrowsers, (browser) => {
               const b = browser.trim();
               const p = {
@@ -154,14 +154,12 @@ module.exports = {
 
             logger.debug(`detected profiles: ${JSON.stringify(returnBrowsers)}`);
 
-            return resolve(returnBrowsers);
-        }).catch(e => {
-            return reject(e);
-        });
+            resolve(returnBrowsers);
           } else {
-            return resolve();
+            resolve();
           }
         });
+      }).catch(e => Promise.reject(e));
   },
 
   /*eslint-disable no-unused-vars*/
