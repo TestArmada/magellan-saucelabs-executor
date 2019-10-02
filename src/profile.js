@@ -108,6 +108,10 @@ module.exports = {
       runArgv = argvMock;
     }
 
+    if (!runArgv.sauce_browser && !runArgv.sauce_browsers) {
+        return Promise.resolve();
+    }
+
     return SauceBrowsers
       .initialize()
       .then(() => {
@@ -154,7 +158,7 @@ module.exports = {
             resolve();
           }
         });
-      });
+      }).catch(e => Promise.reject(e));
   },
 
   /*eslint-disable no-unused-vars*/
