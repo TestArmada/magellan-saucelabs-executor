@@ -102,7 +102,6 @@ module.exports = {
   },
 
   getProfiles: (opts, argvMock) => {
-
     let runArgv = argv;
 
     if (argvMock) {
