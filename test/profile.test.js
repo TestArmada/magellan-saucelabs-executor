@@ -3,6 +3,9 @@
 const profile = require("../src/profile");
 const configuration = require("../src/configuration");
 
+jest.mock("guacamole");
+const SauceBrowsers = require("guacamole");
+
 jest.mock("../src/logger", () => {
   return {
     debug(msg) { },
@@ -18,7 +21,7 @@ jest.mock("../src/logger", () => {
 
 jest.mock("guacamole/src/cli_list", () => {
     return (cb) => {
-        const ret = [{},{}];
+        const ret = [{}];
         ret.options = {
             head:[]
         }
@@ -26,70 +29,59 @@ jest.mock("guacamole/src/cli_list", () => {
     };
 });
 
-
-jest.mock("guacamole", () => {
-    const ret = {
-        initialize() {
-            return Promise.resolve();
-        },
-        get(id) {
-            switch(id.id){
-                case "chrome_67_Windows_10_Desktop":
-                return [{
-                    browserName: "chrome",
-                    version: "67",
-                    platform: "Windows 10",
-                    appiumVersion: "1.6.6"
-                }];
-                case "safari_10_OS_X_10_11_Desktop":
-                return [{
-                    browserName: "safari",
-                    version: "10",
-                    platform: "OS X 10.11",
-                    appiumVersion: "1.6.6"
-                }];
-                case "MicrosoftEdge_14_Windows_10_Desktop":
-                return [{
-                    browserName: "MicrosoftEdge",
-                    version: "14",
-                    platform: "Windows 10",
-                    appiumVersion: "1.6.6"
-                }];
-                case "iphone_12_2_iOS_iPhone_Simulator":
-                return [{
-                    deviceName: "iPhone Simulator",
-                    browserName: "iphone",
-                    deviceOrientation: "portrait",
-                    version: "12.2",
-                    platform: "iOS",
-                }];
-                case "iphone_10_3_iOS_iPhone_7_Simulator":
-                return [{
-                    deviceName: "iPhone 7 Simulator",
-                    browserName: "iphone",
-                    deviceOrientation: "portrait",
-                    version: "10.3",
-                    platform: "iOS",
-                }];
-                default:
-                return [{
-                    browserName: "safari",
-                    version: "10",
-                    platform: "OS X 10.11",
-                    appiumVersion: "1.6.6"
-                }];
-            }
-        },
-        addNormalizedBrowsersFromFile(){}
-    }
-    ret.initialize = jest.fn(() => {
-        return Promise.resolve("foo");
-    });
-    return ret;
-});
-const SauceBrowsers = require("guacamole");
-
 describe("Profile", () => {
+  beforeEach(() => {
+    SauceBrowsers.initialize = jest.fn( () => Promise.resolve());
+    SauceBrowsers.get.mockImplementation((id) => {
+        switch(id.id){
+            case "chrome_67_Windows_10_Desktop":
+            return [{
+                browserName: "chrome",
+                version: "67",
+                platform: "Windows 10",
+                appiumVersion: "1.6.6"
+            }];
+            case "safari_10_OS_X_10_11_Desktop":
+            return [{
+                browserName: "safari",
+                version: "10",
+                platform: "OS X 10.11",
+                appiumVersion: "1.6.6"
+            }];
+            case "MicrosoftEdge_14_Windows_10_Desktop":
+            return [{
+                browserName: "MicrosoftEdge",
+                version: "14",
+                platform: "Windows 10",
+                appiumVersion: "1.6.6"
+            }];
+            case "iphone_12_2_iOS_iPhone_Simulator":
+            return [{
+                deviceName: "iPhone Simulator",
+                browserName: "iphone",
+                deviceOrientation: "portrait",
+                version: "12.2",
+                platform: "iOS",
+            }];
+            case "iphone_10_3_iOS_iPhone_7_Simulator":
+            return [{
+                deviceName: "iPhone 7 Simulator",
+                browserName: "iphone",
+                deviceOrientation: "portrait",
+                version: "10.3",
+                platform: "iOS",
+            }];
+            default:
+            return [{
+                browserName: "safari",
+                version: "10",
+                platform: "OS X 10.11",
+                appiumVersion: "1.6.6"
+            }];
+        }
+    });
+  });
+      
   describe("getNightwatchConfig", () => {
     let p = {};
     let ss = {};
@@ -150,9 +142,6 @@ describe("Profile", () => {
   });
 
   describe("getProfiles", () => {
-    beforeEach(() => {
-        SauceBrowsers.initialize.mockReturnValue(Promise.resolve());
-    });
     test("with sauce_browser", () => {
       let settings = configuration.getConfig();
 
@@ -265,9 +254,6 @@ describe("Profile", () => {
   });
 
   describe("getCapabilities", () => {
-    beforeEach(() => {
-        SauceBrowsers.initialize.mockReturnValue(Promise.resolve());
-    });
     test("desktop web", () => {
       let p = {
         "browser": "MicrosoftEdge_14_Windows_10_Desktop",
@@ -375,9 +361,6 @@ describe("Profile", () => {
   });
 
   describe("listBrowsers", () => {
-    beforeEach(() => {
-        SauceBrowsers.initialize.mockReturnValue(Promise.resolve());
-    });
     test("from sauce", (done) => {
       return profile
         .listBrowsers({}, (err, browserTable) => {
