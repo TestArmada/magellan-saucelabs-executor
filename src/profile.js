@@ -93,7 +93,8 @@ module.exports = {
     // property directly on the environment configuration object (note: this is
     // NOT to be confused with proxy settings in desiredCapabilities, which are
     // used for return path traffic from the remote browser).
-    // NO_WD_PROXY is a hack because looper allows ondemand.saucelabs.com but not saucelabs.com required for status updates
+    // NO_WD_PROXY is a hack because looper allows ondemand.saucelabs.com
+    // but not saucelabs.com required for status updates
     if (sauceSettings.sauceOutboundProxy && !process.env.NO_WD_PROXY) {
       config.proxy = sauceSettings.sauceOutboundProxy;
     }

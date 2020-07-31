@@ -1,7 +1,7 @@
 
 
 const fork = require("child_process").fork;
-const request = require("request");
+const _request = require("request");
 const Tunnel = require("./tunnel");
 const logger = require("./logger");
 const settings = require("./settings");
@@ -10,6 +10,22 @@ const analytics = require("./global_analytics");
 let config = settings.config;
 
 let tunnel = null;
+
+const MAX_RETRIES = 3;
+
+const request = (options, callback, retries = MAX_RETRIES) => {
+  _request(options, (verror, vres, vjson) => {
+    if (verror) {
+      if (retries > 0) {
+        logger.warn(`Request to ${options.url} failed. Retries=${retries}`);
+        return request(options, callback, retries - 1);
+      } else {
+        return callback(verror, vres, vjson);
+      }
+    }
+    return callback(verror, vres, vjson);
+  });
+};
 
 const Executor = {
   setupRunner: (mocks) => {
