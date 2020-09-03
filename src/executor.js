@@ -138,7 +138,7 @@ const Executor = {
         additionalLog = logger.stringifyWarn(`Saucelabs replay can be found at https://saucelabs.com/tests/${sessionId}\n`);
       }
       const infoRequestOption = {
-        url: `https://saucelabs.com/rest/v1/users/${config.tunnel.username}`,
+        url: `https://${process.env.SAUCE_API_HOST || 'saucelabs.com'}/rest/v1/users/${config.tunnel.username}`,
         method: "GET",
         auth: {
           user: config.tunnel.username,
@@ -179,7 +179,7 @@ const Executor = {
         logger.debug(`Updating saucelabs ${requestPath}`);
 
         const requestOptions = {
-          url: `https://saucelabs.com${requestPath}`,
+          url: `https://${process.env.SAUCE_API_HOST || 'saucelabs.com'}${requestPath}`,
           method: "PUT",
           auth: {
             user: config.tunnel.username,
